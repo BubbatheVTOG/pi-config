@@ -223,7 +223,12 @@ def reconcile(old, current, new, name):
         import json
         values = [json.loads(x) for x in (old, current, new)]
         known_keys(*values, path=name)
-        return encoded(merge(*values, path=name))
+        merged = merge(*values, path=name)
+        if merged == values[1]:
+            return current
+        if merged == values[2]:
+            return new
+        return encoded(merged)
     return merge(old, current, new, name)
 
 

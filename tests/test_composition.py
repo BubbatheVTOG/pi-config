@@ -322,6 +322,15 @@ class CompositionTests(unittest.TestCase):
         with self.assertRaisesRegex(Refusal, 'unmanaged local resource'):
             self.plan(gen)
 
+    def test_unchanged_json_preserves_formatting_without_rewrite(self):
+        put(self.core / 'plugin.json', b'{ "size": 8, "enabled": true }\n')
+        commit(self.core)
+        gen = self.generation('one')
+        self.activate_fixture(gen)
+        plan = self.plan(gen)
+        self.assertEqual(plan[3], {})
+        self.assertEqual((self.agent / 'plugin.json').read_bytes(), b'{ "size": 8, "enabled": true }\n')
+
     def test_interrupted_journal_refuses_retry_and_preserves_target(self):
         gen = self.generation('one')
         self.activate_fixture(gen)

@@ -14,8 +14,8 @@
 // verified against pi 0.85.1). Rollback: drop the renderers + this section.
 //
 // Registers `web_search` (self-hosted SearXNG JSON API) and `fetch_content` /
-// `get_search_content` (HTTP fetch + HTML→text). Zero dependencies: Node 18+
-// global fetch only. The model (esp. local opencode-convention models) is
+// `get_search_content` (HTTP fetch + HTML→text). Node 22.19+ global fetch;
+// Pi supplies the declared host peer modules. The model (esp. local opencode-convention models) is
 // trained to call these exact tool names; this restores that surface without
 // re-adding pi-web-access.
 //
