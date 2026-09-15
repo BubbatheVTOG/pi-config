@@ -1,0 +1,14 @@
+{
+  "name": "local-web-search",
+  "version": "0.1.0",
+  "description": "Local-first web search + fetch for pi, backed by self-hosted SearXNG. Pure extension: registers new tools only; never modifies pi core, settings, or built-in behavior (open for extension, closed for modification).",
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "defaultProvider": "vllm",
+  "defaultModel": "bubba",
+  "lastChangelogVersion": "0.85.1",
+  "theme": "hyper-term-white",
+  "packages": [
+    "npm:pi-subagents@0.68.0",
+    "npm:@nguyenquangthai/pi-ask@0.2.0",
+    "npm:@tintinweb/pi-tasks@0.9.0",
+    "npm:pi-powerline-footer@0.17.1",
+    "npm:@narumitw/pi-btw@0.58.1",
+    "npm:pi-lens@4.1.6",
+    "npm:@sting8k/pi-vcc@0.7.2",
+    "npm:pi-tool-display@0.5.0",
+    "npm:pi-image-tools@1.4.0",
+    "npm:pi-transcript-window@0.3.1",
+    "git:github.com/BubbatheVTOG/pi-boxed-tools@main"
+  ],
+  "subagents": {
+    "agentOverrides": {
+      "scout": {
+        "model": "vllm/bubba"
+      },
+      "researcher": {
+        "model": "vllm/bubba",
+        "tools": "inherit"
+      },
+      "oracle": {
+        "thinking": "high"
+      },
+      "delegate": {
+        "acceptanceRole": "read-only"
+      }
+    }
+  },
+  "retry": {
+    "enabled": true,
+    "maxRetries": 3,
+    "baseDelayMs": 2000,
+    "provider": {
+      "maxRetries": 0,
+      "maxRetryDelayMs": 60000
+    }
+  },
+  "hideThinkingBlock": false,
+  "quietStartup": true,
+  "collapseChangelog": true,
+  "powerline": {
+    "welcome": false
+  },
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "steeringMode": "all"
+}

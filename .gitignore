@@ -1,0 +1,26 @@
+# No secrets
+.env*
+*.key
+*.pem
+auth.json
+*credentials*
+*token*
+
+# No runtime logs or session state
+*.log
+sessions/
+run-history.jsonl
+OPTIMIZATION-LOG.md
+models-store.json
+missions/
+tasks/
+tmp/
+web-search-cache/
+
+# No installed dependencies
+node_modules/
+.npm/
+
+# OS/editor files
+.DS_Store
+*~
