@@ -46,7 +46,17 @@
   "quietStartup": true,
   "collapseChangelog": true,
   "powerline": {
-    "welcome": false
+    "welcome": false,
+    "customItems": [
+      {
+        "id": "agent-voice",
+        "statusKey": "agent-voice",
+        "position": "right",
+        "hideWhenMissing": false,
+        "selfColorize": true,
+        "excludeFromExtensionStatuses": true
+      }
+    ]
   },
   "terminal": {
     "showTerminalProgress": true
