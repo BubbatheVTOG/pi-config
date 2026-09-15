@@ -49,8 +49,27 @@ def write(path, data):
     path.write_bytes(data)
 
 
+def npm_supports_allow_remote():
+    """Probe the installed npm once; npm 12+ gates URL (remote) dependencies behind
+    --allow-remote, while older npm rejects the flag as unknown. Version-neutral."""
+    global _NPM_ALLOW_REMOTE
+    if _NPM_ALLOW_REMOTE is None:
+        env = {'PATH': os.environ['PATH'], 'HOME': tempfile.mkdtemp(prefix='pi-npm-')}
+        probe = subprocess.run(['npm', 'install', '--help'], capture_output=True, text=True, env=env)
+        _NPM_ALLOW_REMOTE = probe.returncode == 0 and re.search(r'--allow-remote\b', probe.stdout) is not None
+    return _NPM_ALLOW_REMOTE
+
+
+_NPM_ALLOW_REMOTE = None
+
+
 def npm_run(target, args):
     # No user npmrc, credentials, lifecycle scripts, global writes, or Pi auto-install.
+    extra = []
+    if npm_supports_allow_remote():
+        # Newer npm blocks URL dependencies by default. The pinned archive is a
+        # direct (root) dependency, so root is the tightest sufficient value.
+        extra = ['--allow-remote', 'root']
     with tempfile.TemporaryDirectory(prefix='pi-npm-') as tmp:
         env = {'PATH': os.environ['PATH'], 'HOME': tmp,
                'npm_config_cache': tmp + '/cache', 'npm_config_userconfig': tmp + '/user.npmrc',
@@ -61,7 +80,7 @@ def npm_run(target, args):
                      'SSL_CERT_FILE', 'SSL_CERT_DIR'):
             if name in os.environ:
                 env[name] = os.environ[name]
-        subprocess.run(['npm', *args, '--prefix', str(target), '--ignore-scripts',
+        subprocess.run(['npm', *args, *extra, '--prefix', str(target), '--ignore-scripts',
                         '--legacy-peer-deps', '--no-audit', '--no-fund'], check=True, env=env, stdout=sys.stderr)
 
 
@@ -125,7 +144,10 @@ def resource_inventory(output):
         env = {'PATH': os.environ['PATH'], 'HOME': tmp, 'PI_OFFLINE': '1', 'PI_CODING_AGENT_DIR': tmp + '/agent'}
         result = subprocess.check_output(['node', str(script), str(output), pi_root], cwd=tmp, env=env)
     import json
-    return json.loads(result)
+    try:
+        return json.loads(result)
+    except ValueError as error:
+        raise Refusal(f'inventory output is not valid JSON: {error}') from error
 
 
 def prepare(composed, origins, output, lock):
@@ -243,7 +265,10 @@ def known_keys(old, current, new, path):
 def reconcile(old, current, new, name):
     if name.endswith('.json') and all(x is not MISSING for x in (old, current, new)):
         import json
-        values = [json.loads(x) for x in (old, current, new)]
+        try:
+            values = [json.loads(x) for x in (old, current, new)]
+        except ValueError as error:
+            raise Refusal(f'invalid JSON in three-way inputs for {name}: {error}') from error
         known_keys(*values, path=name)
         merged = merge(*values, path=name)
         if merged == values[1]:
@@ -258,7 +283,10 @@ def effective_config(name, data, desired, models):
     if data is MISSING or desired is MISSING or not name.endswith('.json'):
         return
     import json
-    current, generated = json.loads(data), json.loads(desired)
+    try:
+        current, generated = json.loads(data), json.loads(desired)
+    except ValueError as error:
+        raise Refusal(f'invalid JSON in settings inputs for {name}: {error}') from error
     if name == 'settings.json':
         for kind in ('packages', 'extensions', 'skills', 'prompts', 'themes'):
             require(current.get(kind) == generated.get(kind), f'unmanaged local resource settings: {kind}')
@@ -372,7 +400,10 @@ def deployment_plan(generation, agent, state, home, project):
         if name == 'settings.json' and result is not MISSING:
             import json
             assert isinstance(result, bytes)
-            effective_settings = json.loads(result)
+            try:
+                effective_settings = json.loads(result)
+            except ValueError as error:
+                raise Refusal(f'reconciled settings are not valid JSON: {error}') from error
         if desired is not MISSING:
             assert isinstance(desired, bytes)
             defaults[name] = base64.b64encode(desired).decode()

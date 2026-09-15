@@ -172,7 +172,11 @@ cycle. Do not commit disposable installs or current live settings.
 
 `lock` performs one `npm install --package-lock-only`; `prepare` performs one `npm ci`
 in a new generation. Both ignore lifecycle scripts, isolate npm config/cache/home,
-disable audit/fund calls, and use host-provided Pi peers. All locked artifacts must
+disable audit/fund calls, and use host-provided Pi peers. There is no npm version
+pin: before invoking npm the composer probes `npm install --help` and, only on
+releases that gate URL dependencies behind `--allow-remote`, appends
+`--allow-remote root` so the pinned root-level archive stays installable; older
+releases receive no flag. All locked artifacts must
 have HTTPS resolution and integrity. Normal proxy and TLS certificate policy is inherited; npm auth and user npmrc are
 not. CLI status JSON stays on stdout and npm progress/errors on stderr. No install
 runs in source or the live target. Failures stop; there is no alternative agent protocol or startup repair install.

@@ -64,8 +64,12 @@ Projects of mine that this configuration builds on:
 
 ## Platforms and prerequisites
 
-Required: Pi **0.85.1** exactly (the composer refuses other versions), Node 24 / npm 11,
-Python ≥ 3.12, Git, GNU Stow. Nothing here depends on a distribution: no package
+Required: Pi **0.85.1** exactly (the composer refuses other versions), Node and npm,
+Python ≥ 3.12, Git, GNU Stow. There is no npm version pin: the composer probes the
+installed npm and, only on releases that gate URL dependencies behind
+`--allow-remote`, adds `--allow-remote root` (the pinned archive is a direct,
+root-level dependency, so root is the tightest sufficient value); older releases
+receive no flag. Nothing here depends on a distribution: no package
 manager, no fixed system paths, no architecture assumptions. The npm lock is a
 cross-platform union (Linux/macOS/Windows, x64/arm64) and `prepare` installs only
 the entries for the host.
