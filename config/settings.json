@@ -52,7 +52,7 @@
         "id": "agent-voice",
         "statusKey": "agent-voice",
         "position": "right",
-        "hideWhenMissing": false,
+        "hideWhenMissing": true,
         "selfColorize": true,
         "excludeFromExtensionStatuses": true
       }
