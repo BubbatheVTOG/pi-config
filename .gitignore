@@ -20,6 +20,8 @@ web-search-cache/
 # No installed dependencies
 node_modules/
 .npm/
+__pycache__/
+*.pyc
 
 # OS/editor files
 .DS_Store

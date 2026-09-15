@@ -1,42 +1,32 @@
-# Configuration ownership map
+# Configuration ownership
 
-The live filesystem is a deployment target. Source files belong to one
-repository only; live Pi paths should symlink back to that owner.
+Source is not a live deployment target. Never point live paths into mutable source.
 
-| Live path | Owner | Boundary |
+| Content | Source owner | Deployed form |
 | --- | --- | --- |
-| `~/.pi/agent/settings.json` | `pi-config` | Repository-owned settings and package specs |
-| `~/.pi/agent/models.json` | `pi-config` | Provider/model definitions; credentials remain in environment |
-| `~/.pi/agent/AGENTS.md` | `pi-config` | Global Pi instructions |
-| `~/.pi/agent/themes/` | `OpenCodeHyperTermTheme` | Generated Pi theme output; `pi-config/config/themes/` is a fallback snapshot only |
-| `~/.pi/agent/skills/` | `pi-config` | Backed-up custom skills |
-| `~/.pi/agent/extensions/web-search/` | `pi-config` | Local web-search extension |
-| `~/.pi/agent/extensions/pi-splash.ts` | `pi-config` | Local startup splash |
-| `~/.pi/agent/extensions/pi-tool-display/config.json` | `pi-config` | Renderer ownership/configuration |
-| `~/.pi/agent/npm/package.json` | `pi-config` | npm package manifest snapshot |
-| `~/.pi/agent/npm/package-lock.json` | `pi-config` | npm lock snapshot |
-| `~/.pi/agent/extensions/agent-voice/` | `agent-voice` repo | Symlink into `~/git/agent-voice/extension` |
-| `~/.pi/agent/extensions/ask-herdr-notify.ts` | SIGINT repo | Symlink into SIGINT/dotfiles |
-| `~/.pi/agent/extensions/herdr-agent-state.ts` | Herdr | Generated/managed; never hand-edit or back up |
-| `~/.pi/agent/sessions/` | Pi runtime | Local state; never commit |
-| `~/.pi/agent/auth.json` | Pi runtime | Secret; never copy |
-| `~/.pi/agent/*-cache/` | Pi/runtime services | Generated cache; never commit |
+| Settings and feature manifest | pi-config, plus explicit optional overlay operations | Local writable `settings.json`; resource paths point into one frozen generation |
+| Provider/model definitions | Feature owner, keyed by provider/model ID | Local writable `models.json`; credentials stay outside source |
+| Global instructions | Section/feature owner | Local writable `AGENTS.md`, composed from active sections |
+| VCC/tasks/tool-display/transcript config | Shared core | Local writable copies with generated baseline receipt |
+| Local web tools, splash, plan, pi-improver | pi-config | Stow links only from frozen generation, under `managed/` |
+| Theme fallback snapshots | OpenCodeHyperTermTheme | Frozen snapshot resources; never live generated-theme source links |
+| Boxed text tools | pi-boxed-tools | Exact upstream commit in generation-local dependency tree |
+| Other npm plugins | Their package owners | One combined lock/install in generation-local dependency tree |
+| Optional voice extension | agent-voice | Exact upstream archive/hash copied into frozen generation; no fork |
+| Auth, sessions, cache, task/issue state | Local Pi runtime/user | Never captured, published, adopted or restored |
 
-## Repository boundaries
+Singletons are byte copies (not source symlinks or hardlinks). The deployment receipt
+is local and stores generated baselines, not a capture of current credentials.
+A later deployment compares old-generated/current/new-generated and refuses conflicts.
+Rollback uses the same comparison, preserving later local edits and seed values.
 
-- `~/git/pi-config` owns portable Pi configuration and local extensions that
-  are intentionally bundled in this backup. Its `config/themes/` directory is
-  a fallback snapshot, not the preferred live theme source.
-- `~/git/OpenCodeHyperTermTheme` owns the OpenCode source themes and generated
-  Pi themes under `pi/themes/`; its generator may update the live Pi theme
-  directory.
-- `~/git/pi-boxed-tools` owns the published boxed-tool package. Pi installs it
-  from its GitHub remote; `pi-config` does not duplicate its source.
-- `~/git/agent-voice` owns the voice extension and its implementation.
-- `~/git/sigint` owns SIGINT/dotfiles, including the Herdr notification hook.
-- Other repositories under `~/git` own unrelated projects and must not absorb
-  Pi configuration merely because a symlink points into them.
+`managed/` is not a Pi auto-discovery root. Generated settings point once to immutable
+resource paths there; no second copy is installed into auto-discovery directories.
+The `extensions/` directory at the target contains only declared writable plugin
+config, not duplicate code. Unknown resources, directories, symlinks and ambient
+skill/project discovery are refused, never silently deleted or adopted.
 
-There are currently no nested `.git` directories under `~/git`; the
-`sigint/dotfiles` directory is content inside the SIGINT repository, not a
-second repository.
+Classify meaningful changes with the user before promotion: **Personal/shared**,
+**Enterprise-only**, **Split**, **Local**. Unclassified remains unpublished. Generic
+settings for shared packages, including pi-subagents, live only in public core.
+Local tweaks are not automatically public, even when reconciliation preserves them.

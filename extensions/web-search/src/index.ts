@@ -29,13 +29,16 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { keyHint } from "@earendil-works/pi-coding-agent";
-import { Text } from "@earendil-works/pi-tui";
+import { Text, visibleWidth, truncateToWidth, wrapTextWithAnsi } from "@earendil-works/pi-tui";
+import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 
 const SEARXNG_URL = (
   process.env.SEARXNG_URL || "http://127.0.0.1:8080"
 ).replace(/\/+$/, "");
-const FETCH_TIMEOUT_MS = Number(process.env.WEB_FETCH_TIMEOUT_MS || 20000);
+const configuredTimeout = Number(process.env.WEB_FETCH_TIMEOUT_MS || 20000);
+const FETCH_TIMEOUT_MS = Number.isSafeInteger(configuredTimeout) && configuredTimeout > 0
+  ? configuredTimeout : 20000;
 const FETCH_BODY_LIMIT = 1_500_000; // stop reading at 1.5 MB
 const DEFAULT_MAX_CHARS = 20_000;
 const HARD_MAX_CHARS = 40_000;
@@ -57,6 +60,7 @@ async function runSearch(
   query: string,
   numResults: number,
   timeRange?: string,
+  signal?: AbortSignal,
 ): Promise<string> {
   const params = new URLSearchParams({ q: query, format: "json" });
   if (timeRange) params.set("time_range", timeRange);
@@ -64,7 +68,7 @@ async function runSearch(
   let res: Response;
   try {
     res = await fetch(`${SEARXNG_URL}/search?${params.toString()}`, {
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      signal: requestSignal(signal),
       headers: { accept: "application/json" },
     });
   } catch (err) {
@@ -83,7 +87,9 @@ async function runSearch(
     unresponsive_engines?: unknown;
   };
   try {
-    body = (await res.json()) as typeof body;
+    const raw = await readBody(res);
+    if (raw.truncated) throw new Error("search response exceeds body limit");
+    body = JSON.parse(raw.text) as typeof body;
   } catch (err) {
     return `SearXNG returned non-JSON (HTTP ${res.status}). ${
       err instanceof Error ? err.message : String(err)
@@ -161,7 +167,37 @@ function htmlToText(html: string): string {
   return s;
 }
 
-async function runFetch(url: string, maxChars: number): Promise<string> {
+function requestSignal(signal?: AbortSignal): AbortSignal {
+  const timeout = AbortSignal.timeout(FETCH_TIMEOUT_MS);
+  return signal ? AbortSignal.any([signal, timeout]) : timeout;
+}
+
+async function readBody(res: Response): Promise<{ text: string; truncated: boolean }> {
+  const reader = res.body?.getReader();
+  if (!reader) return { text: "", truncated: false };
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  let truncated = false;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const remaining = FETCH_BODY_LIMIT - total;
+      chunks.push(value.subarray(0, remaining));
+      total += Math.min(value.byteLength, remaining);
+      if (value.byteLength >= remaining) {
+        truncated = true;
+        await reader.cancel();
+        break;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return { text: Buffer.concat(chunks, total).toString("utf8"), truncated };
+}
+
+async function runFetch(url: string, maxChars: number, signal?: AbortSignal): Promise<string> {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -172,66 +208,44 @@ async function runFetch(url: string, maxChars: number): Promise<string> {
     return `Unsupported protocol "${parsed.protocol}" — http/https only.`;
 
   const max = Math.min(maxChars, HARD_MAX_CHARS);
-  const ac = new AbortController();
-  const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
-  let res: Response;
   try {
-    res = await fetch(parsed, {
-      signal: ac.signal,
+    const res = await fetch(parsed, {
+      // The same deadline covers headers AND streaming body, and Esc cancels it.
+      signal: requestSignal(signal),
       redirect: "follow",
       headers: {
         "user-agent": "pi-coding-agent/1.0 (+local research; respect robots)",
         accept: "text/markdown, text/html, text/plain, application/json; q=0.8",
       },
     });
-  } catch (err) {
-    return `Fetch failed for ${url}: ${
-      err instanceof Error ? err.message : String(err)
-    }`;
-  } finally {
-    clearTimeout(timer);
-  }
 
-  const contentType = res.headers.get("content-type") ?? "";
-  const finalUrl = res.url || url;
-  if (!res.ok)
-    return `HTTP ${res.status} from ${finalUrl} (content-type: ${contentType}). Not fetched.`;
-
-  // Read with a byte cap.
-  const reader = res.body?.getReader();
-  if (!reader) return `No readable body for ${finalUrl}.`;
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) {
-      chunks.push(value);
-      total += value.byteLength;
-      if (total >= FETCH_BODY_LIMIT) {
-        reader.cancel().catch(() => {});
-        break;
-      }
+    const contentType = res.headers.get("content-type") ?? "";
+    const finalUrl = res.url || url;
+    if (!res.ok) {
+      await res.body?.cancel();
+      return `HTTP ${res.status} from ${finalUrl} (content-type: ${contentType}). Not fetched.`;
     }
+
+    const body = await readBody(res);
+    const raw = body.text;
+    if (raw.length === 0) return `Empty body from ${finalUrl} (${contentType}).`;
+
+    let text: string;
+    if (contentType.includes("html")) text = htmlToText(raw);
+    else text = raw; // text/plain, markdown, json — keep verbatim
+
+    const truncated = text.length > max;
+    if (truncated) text = text.slice(0, max) + "\n…[truncated]";
+    return (
+      `--- ${finalUrl} (content-type: ${contentType || "unknown"}, ${Buffer.byteLength(raw)} bytes raw) ---\n` +
+      text + (body.truncated ? "\n…[raw body capped]" : "")
+    );
+  } catch (err) {
+    return `Fetch failed for ${url}: ${err instanceof Error ? err.message : String(err)}`;
   }
-  const raw = Buffer.from(chunks.flatMap((c) => Array.from(c))).toString(
-    "utf8",
-  );
-  if (raw.length === 0) return `Empty body from ${finalUrl} (${contentType}).`;
-
-  let text: string;
-  if (contentType.includes("html")) text = htmlToText(raw);
-  else text = raw; // text/plain, markdown, json — keep verbatim
-
-  const truncated = text.length > max;
-  if (truncated) text = text.slice(0, max) + "\n…[truncated]";
-  return (
-    `--- ${finalUrl} (content-type: ${contentType || "unknown"}, ${raw.length} bytes raw) ---\n` +
-    text
-  );
 }
 
-// ── compact TUI rendering (display-only; execute/params untouched) ─────────
+// ── compact TUI rendering (independent of execution) ───────────────────────
 //
 // Collapsed: one-line header + short preview + expand hint. Expanded: full
 // content. Error/empty results are detected by content shape and shown in the
@@ -316,7 +330,6 @@ function updateSlot(
 // stays standalone/publishable.
 
 const BG_COLOR = "userMessageBg";
-const ANSI_SGR_PATTERN = /\u001b\[[0-9;?]*[A-Za-z]/g;
 const ANSI_BG_RESET = "\u001b[49m";
 
 interface BoxTheme {
@@ -365,10 +378,12 @@ function boxedWebResult(
   theme: BoxTheme | undefined,
 ): string[] {
   // Keep edge rows below the terminal wrap boundary in self-shell mode.
-  const w = Math.max(12, width - 2);
+  if (width < 6) return lines.flatMap((line) => wrapTextWithAnsi(line, Math.max(1, width)))
+    .map((line) => truncateToWidth(line, Math.max(0, width), ""));
+  const w = width - 2;
   const inner = Math.max(0, w - 2);
-  const t = title.slice(0, inner);
-  const fill = "─".repeat(Math.max(0, inner - t.length));
+  const t = truncateToWidth(title, inner, "");
+  const fill = "─".repeat(Math.max(0, inner - visibleWidth(t)));
   const out: string[] = [
     bgFill(
       theme,
@@ -378,28 +393,10 @@ function boxedWebResult(
   const bodyInner = Math.max(1, w - 4);
   for (const line of lines) {
     const clean = line.replace(/[ \t]+$/, "");
-    const rows: string[] = [];
-    if (clean.length <= bodyInner) {
-      rows.push(clean);
-    } else {
-      // word-aware wrap so long lines fill the frame instead of truncating
-      let row = "";
-      for (const word of clean.split(" ")) {
-        const candidate = row ? `${row} ${word}` : word;
-        if (candidate.length > bodyInner && row) {
-          rows.push(row);
-          row = word.slice(0, bodyInner);
-        } else if (candidate.length > bodyInner) {
-          rows.push(word.slice(0, bodyInner));
-          row = "";
-        } else {
-          row = candidate;
-        }
-      }
-      if (row) rows.push(row);
-    }
-    for (const row of rows) {
-      const pad = " ".repeat(Math.max(0, bodyInner - row.length));
+    const rows = wrapTextWithAnsi(clean, bodyInner);
+    for (const wrapped of rows) {
+      const row = truncateToWidth(wrapped, bodyInner, "");
+      const pad = " ".repeat(Math.max(0, bodyInner - visibleWidth(row)));
       out.push(
         bgFill(
           theme,
@@ -416,19 +413,12 @@ function webBoxComponent(
   theme: BoxTheme | undefined,
   title: string,
   build: (width: number) => string[],
-): { render: (width: number) => string[] } {
-  let cachedKey = "";
-  let cached: string[] = [];
+): { render: (width: number) => string[]; invalidate: () => void } {
   return {
     render(width: number) {
-      const lines = build(width);
-      const key = `${width}\u0000${lines.length}\u0000${lines[lines.length - 1] ?? ""}`;
-      if (key !== cachedKey || cached.length === 0) {
-        cached = boxedWebResult(lines, title, width, theme);
-        cachedKey = key;
-      }
-      return cached;
+      return boxedWebResult(build(width), title, width, theme);
     },
+    invalidate(): void {},
   };
 }
 
@@ -539,13 +529,8 @@ const WEB_SEARCH_PARAMS = Type.Object({
     }),
   ),
   time_range: Type.Optional(
-    Type.Union(
-      [
-        Type.Literal("day"),
-        Type.Literal("week"),
-        Type.Literal("month"),
-        Type.Literal("year"),
-      ],
+    StringEnum(
+      ["day", "week", "month", "year"] as const,
       {
         description:
           "Recency filter (optional). Use for freshness-sensitive questions.",
@@ -574,17 +559,19 @@ export default function (pi: ExtensionAPI): void {
     name: "web_search",
     label: "Web Search",
     description:
-      "Web search via the local self-hosted SearXNG (127.0.0.1:8080) — no API key, traffic stays on this box. " +
+      "Web search via self-hosted SearXNG (default 127.0.0.1:8080), which forwards queries to configured search engines. " +
       "Returns numbered results: title, URL, snippet. For full page content of a result, call fetch_content (or get_search_content) with its URL. " +
       "Prefer this over curl-ing the SearXNG JSON API by hand.",
     parameters: WEB_SEARCH_PARAMS,
     renderCall: webSearchRenderCall,
     renderResult: webSearchRenderResult,
-    async execute(_id, params) {
+    renderShell: "self",
+    async execute(_id, params, signal) {
       const text = await runSearch(
         params.query,
         params.num_results ?? 5,
         params.time_range,
+        signal,
       );
       return { content: [{ type: "text" as const, text }], details: {} };
     },
@@ -601,10 +588,12 @@ export default function (pi: ExtensionAPI): void {
     renderCall: (args, theme, context) =>
       fetchRenderCall("fetch_content", args, theme, context),
     renderResult: fetchRenderResult,
-    async execute(_id, params) {
+    renderShell: "self",
+    async execute(_id, params, signal) {
       const text = await runFetch(
         params.url,
         params.max_chars ?? DEFAULT_MAX_CHARS,
+        signal,
       );
       return { content: [{ type: "text" as const, text }], details: {} };
     },
@@ -633,10 +622,12 @@ export default function (pi: ExtensionAPI): void {
     renderCall: (args, theme, context) =>
       fetchRenderCall("get_search_content", args, theme, context),
     renderResult: fetchRenderResult,
-    async execute(_id, params) {
+    renderShell: "self",
+    async execute(_id, params, signal) {
       const text = await runFetch(
         params.url,
         params.max_chars ?? DEFAULT_MAX_CHARS,
+        signal,
       );
       return { content: [{ type: "text" as const, text }], details: {} };
     },

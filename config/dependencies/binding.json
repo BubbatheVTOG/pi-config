@@ -1,0 +1,8 @@
+{
+  "coreDigest": "0cd843e756e9bdaf220ccc241e1514e9611d96a4113c98ff48512f7b05fdc72b",
+  "dependenciesDigest": "c61148b49abaedeb7a1ac8e3012b09a5ce91cad68495a474088b2e204ba46940",
+  "inputDigest": "c1a7befb2b2cdacad3845822d1933c456df6a0cbb363726229a78e9f024bc68e",
+  "peerPolicy": "host-provided",
+  "schema": 1,
+  "scripts": "ignore"
+}

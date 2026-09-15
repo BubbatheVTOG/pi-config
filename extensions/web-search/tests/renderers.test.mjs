@@ -17,6 +17,7 @@ const { createJiti } = await import(
 );
 const alias = {
   "@earendil-works/pi-coding-agent": path.join(PKG, "dist/index.js"),
+  "@earendil-works/pi-ai": path.join(PKG, "node_modules/@earendil-works/pi-ai/dist/index.js"),
   "@earendil-works/pi-tui": path.join(
     PKG,
     "node_modules/@earendil-works/pi-tui/dist/index.js",

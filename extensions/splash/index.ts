@@ -1,8 +1,7 @@
 import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const ART_PATH = `${homedir()}/pi-80x26.txt`;
+const ART_PATH = new URL("./art.txt", import.meta.url);
 const ART_WIDTH = 80;
 const ART_HEIGHT = 26;
 const DOCK_ROWS = 6;
@@ -70,7 +69,7 @@ export default function (pi: ExtensionAPI): void {
   let activeTui: { terminal: { columns: number; rows: number } } | undefined;
 
   pi.on("session_start", (event, ctx) => {
-    if (ctx.mode !== "tui") return;
+    if (ctx.mode !== "tui" || !ctx.hasUI) return;
 
     // Drop the built-in startup header so boot is splash + editor + footer.
     ctx.ui.setHeader(() => ({
@@ -108,9 +107,12 @@ export default function (pi: ExtensionAPI): void {
         (tui, _theme, _keybindings, done) => {
           activeTui = tui;
           doneSplash = (): void => done();
+          // The session can close before an asynchronous UI factory is mounted.
+          if (closed) doneSplash();
 
           return {
             render(width: number): string[] {
+              if (width <= 0) return [];
               const terminalWidth = tui.terminal.columns;
               const terminalHeight = tui.terminal.rows;
               if (

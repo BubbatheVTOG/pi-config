@@ -1,141 +1,86 @@
-# Pi configuration backup
+# Personal Pi core
 
-Portable backup and bootstrap configuration for the Pi coding harness.
+A complete standalone personal configuration for Pi 0.85.1, with an optional
+explicit overlay. The public core has no private dependencies.
 
 ![Pi opening screen](docs/assets/pi-config-opening.png)
 
-## What this repository contains
+## Included
 
-- Pi settings and pinned package specifications
-- Provider/model configuration using environment-variable credentials only
-- Theme fallback snapshots (live generated themes are owned by
-  `OpenCodeHyperTermTheme`)
-- `pi-tool-display` ownership configuration
-- Local `web-search` extension source and tests
-- `pi-splash.ts`
-- Custom skills (`plan`, `self-optimize`)
-- Global `AGENTS.md`
-- Bootstrap scripts and external-repository notes
-- A clean Pi opening-screen capture
-- A deliberately busy/dirty workflow capture showing tasks, subagents, LSP,
-  diagnostics, tests, bash, and web search:
+White default and seven upstream theme fallback snapshots; startup splash; enabled
+pi-lens; VCC; task/question UI; powerline footer; edit/write diffs, thinking labels
+and native user box; boxed text tools; image tools; transcript window; pi-subagents
+with upstream tree/FleetView/async defaults; primary `plan`; canonical `pi-improver`
+and thin `self-optimize` entry point. Personal provider, npm BTW, voice and SearXNG
+are separately owned features, so an overlay can exclude each as a complete unit.
 
-![Dirty workflow example](docs/assets/pi-config-dirty-workflow.png)
+The splash uses the latest tracked overlay implementation with bundled original
+80×26 Pi art, not an unavailable home-directory artwork file. Historical screenshots
+illustrate the UI but are not evidence of current live activation.
 
-## Security boundary
+## Safe standalone setup
 
-This repository intentionally contains **no credentials and no logs**.
-
-Excluded permanently:
-
-- `auth.json`
-- API keys, tokens, secrets, `.env` files, private keys
-- session JSONL files and transcripts
-- run history
-- task/mission runtime state
-- debug logs and package debug output
-- model catalogs/cache files
-- npm `node_modules`
-- Herdr-managed state
-- backup files
-
-`config/models.json` references `$VLLM_API_KEY`; the value must be provided by
-the target machine's environment, never committed here.
-
-## Recreate on Ubuntu or Asahi Linux
-
-Install the Pi CLI and Git first, then clone this repository:
+Prerequisites: installed Pi 0.85.1, Node 24/npm 11, Python 3.12, Git and GNU Stow.
+No global installer is included. Clone using HTTPS, review source and dependencies,
+and run local checks. **Do not run `pi install` against the live target.**
 
 ```bash
-git clone git@github.com:BubbatheVTOG/pi-config.git ~/git/pi-config
-cd ~/git/pi-config
-./bootstrap.sh
+python3 scripts/pi-config.py compose
+PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent ./scripts/verify.sh
+
+# Requires a clean committed source tree. Only this explicit candidate step
+# downloads the reviewed dependencies; lifecycle scripts are ignored.
+PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent \
+  python3 scripts/pi-config.py prepare --output /outside/source/generations/personal
+
+# Read-only reconciliation; prints changed paths and diffDigest, never values.
+python3 scripts/pi-config.py diff \
+  --generation /outside/source/generations/personal \
+  --agent-dir /target/home/.pi/agent --state-dir /outside/source/deployment-state \
+  --home /target/home --project /target/workspace
 ```
 
-The bootstrap script:
+`prepare` uses the public standalone lock under `config/dependencies/`. It never
+starts Pi, a service or an agent. Sources and the resulting generation are disjoint.
+Live settings are local writable copies, so UI writes cannot edit source.
 
-1. verifies that `pi` is available
-2. installs the pinned npm and Git packages from `config/packages.txt`
-3. symlinks saved settings, models, themes, skills, and local extensions back
-   to this repository so live files cannot silently drift
-4. installs the `pi-tool-display` ownership split
-5. prints the environment variables still required by the provider config
+Only **after separate deployment approval**, repeat the diff arguments with `deploy`
+and `--expect <reviewed-diffDigest>`. Deployment does not reload Pi. Obtain separate
+reload/restart approval after checking all work is idle. `bootstrap.sh` is now a
+safe compatibility entry point for these explicit commands, not a destructive
+restore script. There is no default live destination and no automatic adoption.
 
-After bootstrap, run `/reload` in Pi.
+Existing unmanaged installations intentionally refuse deployment. Do not solve a
+refusal with `rm -rf` or `stow --adopt`. Inventory, classify and resolve ownership
+with the user first. For credentials use environment references or Pi's local auth
+store; never copy secrets into this repository or generation defaults.
 
-## Provider credentials
+## Composition and maintenance
 
-Set provider credentials outside this repository. For the current vLLM setup:
+See [composition/deployment](docs/composition.md) for the schema, CLI, union-lock
+procedure, reconciliation and rollback boundaries. [OWNERSHIP.md](OWNERSHIP.md)
+describes source versus local state; [EXTERNAL-REPOS.md](EXTERNAL-REPOS.md) records
+independent owners and machine prerequisites. [AGENTS.md](AGENTS.md) is the maintainer
+contract, including classification before promotion and reviewed public-main workflow.
+
+Generic changes to shared plugins belong in this core. Only environment-specific
+routing/compatibility belongs in an overlay. Do not duplicate shared settings there.
+Missing async UI is not proof of a disabled widget; no such fix is claimed here.
+
+## Tests and trust boundary
 
 ```bash
-export VLLM_API_KEY='…'
+PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent \
+PI_CANDIDATE_DEPENDENCIES=/disposable/candidate/dependencies ./scripts/verify.sh
 ```
 
-Do not put that value into `config/models.json`, shell history, or this repo.
+Checks cover composition/exclusion/drift, real Stow against synthetic targets,
+rollback preserving later edits/seeds/credential sentinels, no write-through,
+ambient resource refusal, source-owned UI regressions and pinned boxed-tools when
+candidate dependencies are provided. No model, audio or network request is used by
+tests. Package fetching occurs only in explicit `lock`/`prepare` operations.
 
-## Package and extension inventory
-
-The exact pinned package list is in [`config/packages.txt`](config/packages.txt).
-External repositories and machine integrations are documented in
-[`EXTERNAL-REPOS.md`](EXTERNAL-REPOS.md). Ownership boundaries and live-path
-symlink policy are documented in [`OWNERSHIP.md`](OWNERSHIP.md).
-
-The local web-search extension uses a SearXNG service at
-`http://127.0.0.1:8080` by default. Its source is included under
-`extensions/web-search/`; the service itself is intentionally not part of this
-repository.
-
-Live generated Pi themes are owned by
-[`OpenCodeHyperTermTheme`](https://github.com/BubbatheVTOG/OpenCodeHyperTermTheme).
-The theme files under `config/themes/` are a fallback snapshot for machines
-where that repository has not yet been cloned.
-
-### Installed extension inventory
-
-| Extension/package | Version | Source | Purpose |
-| --- | ---: | --- | --- |
-| `pi-subagents` | 0.68.0 | npm | Delegation and multi-agent workflows |
-| `@nguyenquangthai/pi-ask` | 0.2.0 | npm | Structured question/review dialogs |
-| `@tintinweb/pi-tasks` | 0.9.0 | npm | Task tracking and `/tasks` widget |
-| `pi-powerline-footer` | 0.17.1 | npm | Powerline/status footer |
-| `@narumitw/pi-btw` | 0.58.1 | npm | `/btw` side questions |
-| `pi-lens` | 4.1.6 | npm | LSP, diagnostics, AST/LSP navigation |
-| `@sting8k/pi-vcc` | 0.7.2 | npm | Transcript-preserving compaction and recall |
-| `pi-tool-display` | 0.5.0 | npm | Compact output, diffs, native user box |
-| `pi-image-tools` | 1.4.0 | npm | Image attachments and rendering |
-| `pi-transcript-window` | 0.3.1 | npm | Hide older transcript entries |
-| `pi-boxed-tools` | 0.1.0 | GitHub | User-box-style `read`/`grep`/`find`/`ls`/`bash` rendering |
-| `local-web-search` | 0.1.0 | included here | `web_search`, `fetch_content`, `get_search_content` |
-| `pi-splash.ts` | local | included here | Startup splash screen |
-| `agent-voice` | 0.1.0+ | external repo | Local TTS announcements plus `VOICE ON`/`VOICE OFF` footer status; off by default |
-| `ask-herdr-notify.ts` | local | SIGINT/dotfiles | Herdr notification integration |
-| `herdr-agent-state.ts` | managed | Herdr | Herdr pane/agent state integration; regenerated by Herdr |
-
-The ownership split is intentional: `pi-boxed-tools` owns the five text
-renderers, while `pi-tool-display` keeps `edit`/`write` diffs, thinking labels,
-and the native user-message box.
-
-Agent voice publishes the `agent-voice` status key; `pi-config` places it in
-the powerline footer. The status uses green `VOICE ON`, muted gray `VOICE OFF`,
-and amber `VOICE BLOCKED` when `AGENT_VOICE_OFF=1` is active.
-
-## Verification
-
-The backup includes deterministic renderer tests for the local web-search
-extension. Run them after Pi is installed:
-
-```bash
-./scripts/verify.sh
-```
-
-The verification script checks JSON, scans for forbidden secret/log files,
-and runs the local renderer harnesses where the Pi core package is available.
-
-## Files that are intentionally not here
-
-- Pi's CLI installation itself — reinstall/update with `pi update --self`
-- Herdr's managed integration — reinstall through Herdr
-- `agent-voice` source — maintained in its own repository and listed in
-  `EXTERNAL-REPOS.md`
-- SIGINT/dotfiles — maintained in its own repository
-- SearXNG/Docker — machine service, not Pi configuration
+Extensions run with the user's full permissions. Declared inventory, static checks
+and no-network mocks are **not a sandbox** or proof about arbitrary plugin behavior.
+Review dynamic registrations, package lifecycle changes and project discovery before
+activation. Credentials, transcripts, logs, caches and generated artifacts remain local.

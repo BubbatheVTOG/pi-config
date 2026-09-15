@@ -8,10 +8,10 @@ description: Plan non-trivial work before executing it. Clarifies the goal, defi
 Produce a plan that can actually be executed successfully. The plan is a
 **risk-reduction document**, not a restatement of the request.
 
-Pi has no built-in plan mode by design, so the plan lives in a file
-(`PLAN.md` at the project root, or `~/.pi/agent/plans/<name>.md` when the work
-is not project-local). That file is the source of truth: it survives compaction,
-it is what you check boxes in as you go, and it is what the user reviews.
+Present the plan in the conversation by default. Write a durable plan only when
+the user requests it, at an agreed destination. For long or interrupted work, a
+brief approved checkpoint can preserve verified progress and pending decisions;
+no project file, home-directory report or numbered release ceremony is compulsory.
 
 ## Ground rules
 
@@ -73,8 +73,11 @@ Ask, for each: *"what would make the wrong thing hard or impossible here?"*
   anything so you know what green looks like on this machine.
 - **Remove the need for care.** Idempotent scripts (`stow -R`, `spotless:apply`,
   `mix precommit`), pre-commit hooks, dry-run flags, `--check` modes.
-- **Make reversibility cheap.** Branch, git checkpoint, stash, backup, feature
-  flag, env toggle. Prefer additive changes; delete in a later commit.
+- **Make reversibility cheap.** Use an approved source checkpoint or feature flag.
+  Do not automatically branch, stash or capture live configuration. For harness
+  changes, freeze a clean source commit outside the mutable repository; deploy
+  through a reviewed three-way diff. Rollback must preserve later local edits,
+  seeds and credentials. Source edits never activate themselves.
 - **Make the order forgiving.** Sequence steps so each is verifiable on its own
   and a failure is caught at the step that caused it.
 
@@ -119,17 +122,19 @@ Mark the checkpoints where you will stop and report rather than continue.
 
 ### 6. Set the environment up for success
 
-Before step one — which is to say, *after* the go: branch or checkpoint, confirm
-the toolchain, capture the green baseline, decide the rollback, then create the
-tasks (step 7).
+Before step one — *after* the go — inspect current refs and work, confirm the
+toolchain, capture the green baseline, agree a recoverable checkpoint and rollback,
+then create tasks where useful (step 7). Follow the repository's branch policy;
+a go is not permission to create a feature branch, stash, publish or reload.
 
 For genuinely uncertain plans, run `oracle` over the finished plan for a second
 opinion before executing — it is cheaper than one wrong implementation.
 
 ### 7. Create the tasks
 
-Never rely on memory or the transcript: long sessions compact, and a forgotten
-step is a silently unfinished plan. Record the work with pi-tasks.
+For substantial multi-step work, use pi-tasks when available and approved. A
+short plan in the conversation is enough for small work. If persistence is needed,
+agree a concise checkpoint rather than imposing files or task tooling.
 
 - **One task per verifiable step.** `subject` imperative and short; `description`
   carries the acceptance criteria, the verification command, and the rollback.
@@ -177,11 +182,15 @@ Rules for the gate:
   to some *other* question is not a go. Wait for the go.
 - **A conditional go is a re-plan.** "Go, but use Redis instead" means update the
   affected steps, the pre-mortem, and the task graph before touching anything.
-- **On go:** create the branch/checkpoint, capture the baseline, create the
-  tasks, then work the steps in order and check them off as each verification
-  passes.
-- **Resuming later:** if the session ends mid-execution, `PLAN.md` plus the task
-  list is the handoff. Re-read both before continuing; do not work from memory.
+- **On go:** preserve existing work, capture the baseline, use the agreed
+  checkpoint/tasks, then work the steps in order and verify each.
+- **Resuming later:** re-read the agreed handoff and available task state, confirm
+  source/input drift and remaining approval scope before continuing.
+- **Promotion and activation:** classify meaningful change batches with the user
+  as Personal/shared, Enterprise-only, Split or Local before publication.
+  Unclassified stays unpublished. Execution approval is not publication,
+  deployment or reload approval. Shared plugin defaults belong in core; overlay
+  routing must not duplicate shared settings.
 
 ## Asking follow-up questions
 
@@ -242,7 +251,8 @@ What this deliberately does not do.
 2. ...
 
 ## Environment setup
-Branch/checkpoint, toolchain, baseline command, rollback command.
+Current refs and preserved work, approved checkpoint, toolchain, baseline and
+rollback commands. For Pi config: frozen snapshot and writable-local-copy diff.
 
 ## Task graph
 ```
