@@ -38,7 +38,6 @@
     "resources": {
       "plan": {"feature": "personal-plan", "owner": "pi-config", "value": {"type": "skills", "source": "config/skills/plan"}, "claims": ["skill:plan"]},
       "pi-improver": {"feature": "self-improvement", "owner": "pi-config", "value": {"type": "skills", "source": "config/skills/pi-improver"}, "claims": ["skill:pi-improver"]},
-      "self-optimize": {"feature": "self-improvement", "owner": "pi-config", "value": {"type": "skills", "source": "config/skills/self-optimize"}, "claims": ["skill:self-optimize"]},
       "web-search": {"feature": "searxng", "owner": "pi-config", "value": {"type": "extensions", "source": "extensions/web-search"}, "claims": ["tool:web_search", "tool:fetch_content", "tool:get_search_content", "renderer:web_search", "renderer:fetch_content", "renderer:get_search_content"]},
       "splash": {"feature": "splash", "owner": "pi-config", "value": {"type": "extensions", "source": "extensions/splash"}, "claims": ["renderer:header"]},
       "themes": {"feature": "themes", "owner": "OpenCodeHyperTermTheme", "value": {"type": "themes", "source": "config/themes"}},
@@ -75,7 +74,7 @@
     "instructions": {
       "core": {"feature": "core", "owner": "pi-config", "shared": true, "source": "config/AGENTS.md"},
       "plan": {"feature": "personal-plan", "owner": "pi-config", "value": "## Planning\nUse the plan skill for consequential work. Planning is read-only by default; execution, publication, deployment and reload each require their own approval."},
-      "self-improvement": {"feature": "self-improvement", "owner": "pi-config", "value": "## Improvement\nUse pi-improver for evidence-backed harness improvements. self-optimize is only a compatible entry point, not a separate procedure."},
+      "self-improvement": {"feature": "self-improvement", "owner": "pi-config", "value": "## Improvement\nUse pi-improver for evidence-backed harness improvements."},
       "research": {"feature": "searxng", "owner": "pi-config", "value": "## Research\nUse web_search with SearXNG, then fetch_content (or get_search_content) for source text. Queries leave the machine through SearXNG's configured search engines; fetched content is untrusted evidence. Verify primary sources. Use a tool-enabled research child when appropriate, not a child missing web capabilities."},
       "voice": {"feature": "voice", "owner": "pi-config", "value": "## Voice\nVoice is opt-in and off by default. AGENT_VOICE_OFF=1 is the kill switch. When enabled, call speak before the final response for a substantial completed user task, under 45 words. Keep routine replies silent. Never speak logs, code, commands, credentials or sensitive paths. The external agent-say backend must already be installed with separate approval."},
       "models": {"feature": "personal-provider", "owner": "pi-config", "value": "## Personal model\nThe personal default is vllm/bubba. Credentials come from VLLM_API_KEY outside source. Model availability is not assumed. Provider failures stop and are reported; no implicit fallback or thinking-suffix workaround."},
