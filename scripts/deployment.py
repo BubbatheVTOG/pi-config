@@ -25,7 +25,7 @@ MISSING = object()
 RUNTIME_NAMES = {'auth.json', 'trust.json', 'sessions', 'cache', 'logs', 'models-cache',
                  'models-store.json', 'subagent-artifacts', 'subagent-runs', 'tasks',
                  'pi-improver', 'missions', 'plans', 'powerline-footer', 'web-search-cache',
-                 'history.json', 'package-state.json'}
+                 'history.json', 'run-history.jsonl', 'package-state.json'}
 
 
 def canonical_path(path):
