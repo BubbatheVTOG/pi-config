@@ -90,6 +90,10 @@ Installed extensions: `pi-subagents`, `@tintinweb/pi-tasks`, `@nguyenquangthai/p
   into it; `./install.sh` is the one-shot (re)installer; edits through the live paths
   are repo edits. The announcement policy, word budget, full config reference, and the
   evidence behind all of it: `~/git/agent-voice/extension/README.md`.
+  When voice is enabled, call `speak` before the final response for a substantial
+  user-requested task that just completed, using a concise summary under 45 words.
+  Keep routine replies and quick successes silent; never speak logs, code, commands,
+  secrets, or paths containing sensitive information.
 
 ## Subagents and model selection
 
