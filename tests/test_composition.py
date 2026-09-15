@@ -23,8 +23,10 @@ def put(path, value):
 
 def commit(root):
     subprocess.run(['git', '-C', str(root), 'add', '.'], check=True, capture_output=True)
+    env = {**os.environ, 'GIT_AUTHOR_NAME': 'Example', 'GIT_AUTHOR_EMAIL': 'tester@example.invalid',
+           'GIT_COMMITTER_NAME': 'Example', 'GIT_COMMITTER_EMAIL': 'tester@example.invalid'}
     subprocess.run(['git', '-C', str(root), '-c', 'user.name=Example', '-c', 'user.email=tester@example.invalid',
-                    'commit', '-qm', 'Fixture checkpoint'], check=True)
+                    'commit', '-qm', 'Fixture checkpoint'], check=True, env=env)
 
 
 def entry(value, feature='base', **kw):
@@ -328,6 +330,20 @@ class CompositionTests(unittest.TestCase):
         with self.assertRaisesRegex(Refusal, 'journal exists'):
             self.plan(gen)
         self.assertEqual(before, (self.agent / 'settings.json').read_bytes())
+
+    def test_public_identity_preflight_rejects_ambient_override_without_exposing_it(self):
+        for key, value in [('user.name', 'Example'), ('user.email', 'tester@example.invalid')]:
+            subprocess.run(['git', '-C', str(self.core), 'config', '--local', key, value], check=True)
+        script = Path(__file__).resolve().parents[1] / 'scripts/check-public-identity.py'
+        env = {**os.environ, 'GIT_AUTHOR_NAME': 'Example', 'GIT_AUTHOR_EMAIL': 'tester@example.invalid',
+               'GIT_COMMITTER_NAME': 'Example', 'GIT_COMMITTER_EMAIL': 'tester@example.invalid'}
+        command = [sys.executable, str(script), '--repo', str(self.core)]
+        self.assertEqual(subprocess.run(command, env=env, capture_output=True).returncode, 0)
+        env['GIT_AUTHOR_NAME'] = 'Unexpected Example'
+        failed = subprocess.run(command, env=env, capture_output=True, text=True)
+        self.assertEqual(failed.returncode, 1)
+        self.assertIn('ambient Git author differs', failed.stderr)
+        self.assertNotIn('Unexpected Example', failed.stderr)
 
     def test_source_dirty_freeze_and_unknown_json_key_fail(self):
         put(self.core / 'untracked', b'not approved')

@@ -7,6 +7,7 @@ import io
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 import urllib.request
@@ -42,8 +43,14 @@ def npm_run(target, args):
         env = {'PATH': os.environ['PATH'], 'HOME': tmp,
                'npm_config_cache': tmp + '/cache', 'npm_config_userconfig': tmp + '/user.npmrc',
                'npm_config_globalconfig': tmp + '/global.npmrc', 'npm_config_update_notifier': 'false'}
+        # Preserve normal transport/CA policy, but never npm auth or user npmrc.
+        for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY', 'http_proxy',
+                     'https_proxy', 'all_proxy', 'no_proxy', 'NODE_EXTRA_CA_CERTS',
+                     'SSL_CERT_FILE', 'SSL_CERT_DIR'):
+            if name in os.environ:
+                env[name] = os.environ[name]
         subprocess.run(['npm', *args, '--prefix', str(target), '--ignore-scripts',
-                        '--legacy-peer-deps', '--no-audit', '--no-fund'], check=True, env=env)
+                        '--legacy-peer-deps', '--no-audit', '--no-fund'], check=True, env=env, stdout=sys.stderr)
 
 
 def make_lock(composed, output):

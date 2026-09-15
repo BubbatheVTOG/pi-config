@@ -46,7 +46,12 @@ Run `scripts/verify.sh` with the installed Pi root and disposable candidate deps
 Review outgoing files **and Git metadata** (author/committer, exact commits and
 ancestry), secret/runtime exclusions, ownership, standalone and synthetic overlay
 results. Use approved repo-local public identity, never alter global identity.
-Commit only reviewed public content. No numbered release/changelog ceremony.
+Ambient `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables can override local config.
+Set all four explicitly to the approved repository-local identity for **every**
+public commit process, then run `scripts/check-public-identity.py --base origin/main`
+in that same environment before committing. Recheck commit metadata afterward;
+wrong metadata blocks publication. Commit only reviewed public content. No
+numbered release/changelog ceremony.
 
 When publication is approved, publish the exact reviewed public main commit first;
 a dependent overlay can then pin that exact core commit. Children never push.

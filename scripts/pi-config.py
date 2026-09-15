@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compose, lock, freeze, diff and deploy Pi without starting or reloading Pi."""
 import argparse
-import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -66,6 +66,6 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except (Refusal, OSError, ValueError) as error:
+    except (Refusal, OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f'REFUSED: {error}', file=sys.stderr)
         sys.exit(1)

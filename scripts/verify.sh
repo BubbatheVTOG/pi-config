@@ -43,7 +43,7 @@ PY
 bash -n bootstrap.sh scripts/verify.sh
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 node extensions/web-search/tests/renderers.test.mjs
-node --test tests/ui.test.mjs
+node --test tests/*.test.mjs
 if [[ -z "${PI_CANDIDATE_DEPENDENCIES:-}" ]]; then
   printf '%s\n' 'Pinned dependency renderer check skipped: set PI_CANDIDATE_DEPENDENCIES for the publication gate.'
 fi

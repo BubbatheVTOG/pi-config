@@ -118,8 +118,9 @@ cycle. Do not commit disposable installs or current live settings.
 `lock` performs one `npm install --package-lock-only`; `prepare` performs one `npm ci`
 in a new generation. Both ignore lifecycle scripts, isolate npm config/cache/home,
 disable audit/fund calls, and use host-provided Pi peers. All locked artifacts must
-have HTTPS resolution and integrity. No install runs in source or the live target.
-Failures stop; there is no alternative agent protocol or startup repair install.
+have HTTPS resolution and integrity. Normal proxy and TLS certificate policy is inherited; npm auth and user npmrc are
+not. CLI status JSON stays on stdout and npm progress/errors on stderr. No install
+runs in source or the live target. Failures stop; there is no alternative agent protocol or startup repair install.
 
 `prepare --overlay` requires `--lock /path/to/reviewed/union-lock`. The public lock
 cannot be reused for a changed union. Package entries in effective settings become
@@ -180,6 +181,13 @@ affected workflow; the owner must compare the planned receipt, old generation an
 actual target, preserve later edits, and approve recovery. Never blindly delete a
 journal to retry. Keep Pi idle during deployment: advisory locks cannot prevent an
 uncooperative process writing between the final check and atomic replacement.
+
+Before any public commit, explicitly set `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`,
+`GIT_COMMITTER_NAME` and `GIT_COMMITTER_EMAIL` from the approved repo-local public
+identity, and run `python3 scripts/check-public-identity.py --base origin/main` in
+that environment. Repo config alone does not outrank ambient identity variables.
+The check refuses mismatches without printing the unexpected identity. Verify the
+resulting commit's identity, exact tree and ancestry again before publication.
 
 There is no automatic migration/adoption of existing unmanaged installations. The
 initial owner inventory is a separate human-reviewed prerequisite. Unknown paths
