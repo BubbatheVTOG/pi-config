@@ -125,8 +125,8 @@ Renderer harness (no LLM, deterministic; loads the real module through pi's
 own jiti pipeline with the same core-package aliases pi's loader uses):
 
 ```bash
-cd /home/bubba/.npm-global/lib/node_modules/@earendil-works/pi-coding-agent && \
-  node /home/bubba/.pi/agent/extensions/web-search/tests/renderers.test.mjs
+PI_CODING_AGENT_ROOT=/path/to/@earendil-works/pi-coding-agent \
+  node extensions/web-search/tests/renderers.test.mjs
 ```
 
 Verified 2026-09-14: all renderer states pass (normal/error/empty/partial,

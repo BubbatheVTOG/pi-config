@@ -8,7 +8,7 @@ repository only; live Pi paths should symlink back to that owner.
 | `~/.pi/agent/settings.json` | `pi-config` | Repository-owned settings and package specs |
 | `~/.pi/agent/models.json` | `pi-config` | Provider/model definitions; credentials remain in environment |
 | `~/.pi/agent/AGENTS.md` | `pi-config` | Global Pi instructions |
-| `~/.pi/agent/themes/` | `pi-config` | Theme collection |
+| `~/.pi/agent/themes/` | `OpenCodeHyperTermTheme` | Generated Pi theme output; `pi-config/config/themes/` is a fallback snapshot only |
 | `~/.pi/agent/skills/` | `pi-config` | Backed-up custom skills |
 | `~/.pi/agent/extensions/web-search/` | `pi-config` | Local web-search extension |
 | `~/.pi/agent/extensions/pi-splash.ts` | `pi-config` | Local startup splash |
@@ -25,7 +25,11 @@ repository only; live Pi paths should symlink back to that owner.
 ## Repository boundaries
 
 - `~/git/pi-config` owns portable Pi configuration and local extensions that
-  are intentionally bundled in this backup.
+  are intentionally bundled in this backup. Its `config/themes/` directory is
+  a fallback snapshot, not the preferred live theme source.
+- `~/git/OpenCodeHyperTermTheme` owns the OpenCode source themes and generated
+  Pi themes under `pi/themes/`; its generator may update the live Pi theme
+  directory.
 - `~/git/pi-boxed-tools` owns the published boxed-tool package. Pi installs it
   from its GitHub remote; `pi-config` does not duplicate its source.
 - `~/git/agent-voice` owns the voice extension and its implementation.

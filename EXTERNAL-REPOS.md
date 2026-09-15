@@ -6,6 +6,7 @@ Clone them only if the target machine needs the corresponding feature.
 | Component | Repository | Setup |
 | --- | --- | --- |
 | `pi-boxed-tools` | `git@github.com:BubbatheVTOG/pi-boxed-tools.git` | Installed from `config/packages.txt` |
+| `OpenCodeHyperTermTheme` | `git@github.com:BubbatheVTOG/OpenCodeHyperTermTheme.git` | Owns OpenCode source themes and generated `pi/themes/` output |
 | `agent-voice` | `git@github.com:BubbatheVTOG/agent-voice.git` | Clone to `~/git/agent-voice`, then link `extension/` into Pi extensions |
 | SIGINT/dotfiles | `git@github.com:BubbatheVTOG/SIGINT.git` | Provides `ask-herdr-notify.ts` and other machine dotfiles |
 | Herdr | Herdr-managed integration | Reinstall through Herdr; do not copy `herdr-agent-state.ts` |

@@ -8,7 +8,8 @@ Portable backup and bootstrap configuration for the Pi coding harness.
 
 - Pi settings and pinned package specifications
 - Provider/model configuration using environment-variable credentials only
-- All custom themes
+- Theme fallback snapshots (live generated themes are owned by
+  `OpenCodeHyperTermTheme`)
 - `pi-tool-display` ownership configuration
 - Local `web-search` extension source and tests
 - `pi-splash.ts`
@@ -83,6 +84,11 @@ The local web-search extension uses a SearXNG service at
 `http://127.0.0.1:8080` by default. Its source is included under
 `extensions/web-search/`; the service itself is intentionally not part of this
 repository.
+
+Live generated Pi themes are owned by
+[`OpenCodeHyperTermTheme`](https://github.com/BubbatheVTOG/OpenCodeHyperTermTheme).
+The theme files under `config/themes/` are a fallback snapshot for machines
+where that repository has not yet been cloned.
 
 ### Installed extension inventory
 

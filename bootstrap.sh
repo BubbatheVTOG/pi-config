@@ -35,7 +35,13 @@ link_path "$ROOT/config/pi-vcc-config.json" "$AGENT_DIR/pi-vcc-config.json"
 link_path "$ROOT/config/tasks-config.json" "$AGENT_DIR/tasks-config.json"
 link_path "$ROOT/config/npm-package.json" "$AGENT_DIR/npm/package.json"
 link_path "$ROOT/config/npm-package-lock.json" "$AGENT_DIR/npm/package-lock.json"
-link_path "$ROOT/config/themes" "$AGENT_DIR/themes"
+THEME_REPO="$HOME/git/OpenCodeHyperTermTheme/pi/themes"
+if [[ -d "$THEME_REPO" ]]; then
+  link_path "$THEME_REPO" "$AGENT_DIR/themes"
+else
+  echo "OpenCodeHyperTermTheme not found; using pi-config theme snapshot." >&2
+  link_path "$ROOT/config/themes" "$AGENT_DIR/themes"
+fi
 link_path "$ROOT/config/skills" "$AGENT_DIR/skills"
 link_path "$ROOT/extensions/web-search" "$AGENT_DIR/extensions/web-search"
 link_path "$ROOT/extensions/pi-splash.ts" "$AGENT_DIR/extensions/pi-splash.ts"
