@@ -91,6 +91,61 @@ UI/default configuration. Upstream tree/FleetView/async widget defaults remain o
 Only explicitly environment-specific routing/compatibility belongs in the overlay.
 New resources and private skills need their own feature/owner and collision checks.
 
+## Source ownership and deployed form
+
+Source is not a live deployment target. Never point live paths into mutable source.
+
+| Content | Source owner | Deployed form |
+| --- | --- | --- |
+| Settings and feature manifest | pi-config, plus explicit optional overlay operations | Local writable `settings.json`; resource paths point into one frozen generation |
+| Provider/model definitions | Feature owner, keyed by provider/model ID | Local writable `models.json`; credentials stay outside source |
+| Global instructions | Section/feature owner | Local writable `AGENTS.md`, composed from active sections |
+| VCC/tasks/tool-display/transcript config | Shared core | Local writable copies with generated baseline receipt |
+| Local web tools, splash, plan, pi-improver | pi-config | Stow links only from frozen generation, under `managed/` |
+| Theme fallback snapshots | OpenCodeHyperTermTheme | Frozen snapshot resources; never live generated-theme source links |
+| Boxed text tools | pi-boxed-tools | Exact upstream commit in generation-local dependency tree |
+| Other npm plugins | Their package owners | One combined lock/install in generation-local dependency tree |
+| Optional voice extension | agent-voice | Exact upstream archive/hash copied into frozen generation; no fork |
+| Auth, sessions, cache, task/issue state | Local Pi runtime/user | Never captured, published, adopted or restored |
+
+Singletons are byte copies (not source symlinks or hardlinks). The deployment receipt
+is local and stores generated baselines, not a capture of current credentials.
+`managed/` is not a Pi auto-discovery root: generated settings point once to immutable
+resource paths there, and no second copy is installed into auto-discovery directories.
+The target `extensions/` directory contains only declared writable plugin config.
+
+Classify meaningful changes with the user before promotion: **Personal/shared**,
+**Enterprise-only**, **Split**, **Local**. Unclassified remains unpublished. Generic
+settings for shared packages, including pi-subagents, live only in public core.
+Local tweaks are not automatically public, even when reconciliation preserves them.
+
+## Independent owners and machine prerequisites
+
+| Component | Owner/source | Candidate boundary |
+| --- | --- | --- |
+| pi-boxed-tools | https://github.com/BubbatheVTOG/pi-boxed-tools | Commit `9ad64f8d773708aef9a823a2bc896c5537d8b0e0`, HTTPS archive in npm union lock; source not forked here |
+| OpenCodeHyperTermTheme | https://github.com/BubbatheVTOG/OpenCodeHyperTermTheme | `config/themes/` fallback snapshots; no mutable external theme symlink |
+| agent-voice | https://github.com/BubbatheVTOG/agent-voice | Commit `8b32166f0d3f2f592779468f3d5b2762ec93c941`, archive SHA-256 in manifest; only the extension resource is deployed |
+| npm plugins | Exact identities/revisions in `manifest.json` | Complete public lock in `config/dependencies/`; no sequential Pi installs |
+| SearXNG | User-managed service | Optional personal feature, default endpoint `http://127.0.0.1:8080`; no service setup/startup here |
+| agent-say/TTS | agent-voice owner | Separate opt-in backend prerequisite; not installed or started here |
+
+Voice is off by default and its footer indicator is part of the same feature. SearXNG
+forwards queries to its configured engines; a loopback endpoint does not mean data
+stays on the machine. Additional integrations need explicit feature ownership,
+classification, collision review and separate activation approval; unknown existing
+hooks cause deployment to refuse.
+
+All npm candidate installs use `--ignore-scripts --legacy-peer-deps --no-audit
+--no-fund`. Pi supplies host peer modules; several UI packages advertise stale peer
+ranges, so compatibility is checked with the installed Pi and no-network tests.
+Reviewed postinstall hooks in pi-tool-display/pi-image-tools look for a separate live
+patch helper and are unnecessary in a generation. The npm pi-lens artifact already
+includes its compiled distribution/grammars; its prepare hook is not run. Native
+optional npm artifacts supply ast-grep on supported platforms; missing prerequisites
+are reported, not repaired during Pi startup. Pi-lens can separately auto-install
+language tools during normal use; that runtime path is not started by this tooling.
+
 ## Complete union lock
 
 Public lock files live under `config/dependencies/`:
@@ -186,8 +241,9 @@ Reconciliation compares old-generated, current and new-generated:
 - resource package/path lists and renderer ownership cannot drift locally;
 - default and subagent model references must remain in effective inventory;
 - existing unowned singletons refuse, even if their bytes happen to match;
-- seeds are not overwritten; auth and runtime state, including subagent missions,
-  are not read or captured;
+- seeds are not overwritten; auth and known runtime state (`sessions`, `tasks`,
+  `missions`, `plans`, `powerline-footer`, `web-search-cache`, model/history caches)
+  are not read, captured or removed; any other unmanaged name still refuses;
 - Pi's automatic `lastChangelogVersion` metadata is preserved locally when it is
   a valid version string; it is not promoted into source defaults. Other unknown
   settings keys still require review.

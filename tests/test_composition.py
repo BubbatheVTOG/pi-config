@@ -332,20 +332,27 @@ class CompositionTests(unittest.TestCase):
         self.assertEqual(read_json(self.agent / 'seed.json')['local'], 'preserve')
         self.assertEqual((self.agent / 'auth.json').read_bytes(), b'fictional credential sentinel')
 
-    def test_mission_history_survives_redeployment_and_rollback(self):
+    def test_plugin_runtime_state_survives_redeployment_and_rollback(self):
         one = self.generation('one')
         self.activate_fixture(one)
-        history = self.agent / 'missions/projects/example/mission.json'
-        put(history, {'status': 'completed', 'summary': 'Preserve local runtime history'})
-        original = history.read_bytes()
+        runtime = {'missions': 'projects/example/mission.json', 'plans': 'example/plan.md',
+                   'powerline-footer': 'state.json', 'web-search-cache': 'example.json'}
+        originals = {}
+        for name, item in runtime.items():
+            path = self.agent / name / item
+            put(path, f'Preserve local {name} runtime state'.encode())
+            originals[name] = path.read_bytes()
         put(self.core / 'plugin.json', {'enabled': False, 'size': 8})
         commit(self.core)
         two = self.generation('two')
         self.activate_fixture(two)
-        self.assertEqual(history.read_bytes(), original)
         self.activate_fixture(one)
-        self.assertEqual(history.read_bytes(), original)
-        self.assertNotIn('missions', read_json(self.state / 'receipt.json')['baseline'])
+        receipt = read_json(self.state / 'receipt.json')
+        for name, item in runtime.items():
+            with self.subTest(runtime=name):
+                self.assertEqual((self.agent / name / item).read_bytes(), originals[name])
+                self.assertNotIn(name, receipt['baseline'])
+                self.assertNotIn(name, receipt['links'])
         put(self.agent / 'unknown-runtime/item.json', {})
         with self.assertRaisesRegex(Refusal, 'unmanaged target'):
             self.plan(one)

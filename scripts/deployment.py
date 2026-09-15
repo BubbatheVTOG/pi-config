@@ -20,9 +20,12 @@ from composition import (Refusal, anchored, binding, check_lock, compose, depend
 
 
 MISSING = object()
+# Pi and its plugins create these after activation. They are never read, captured,
+# adopted or removed; a name outside this reviewed allowlist still refuses.
 RUNTIME_NAMES = {'auth.json', 'trust.json', 'sessions', 'cache', 'logs', 'models-cache',
                  'models-store.json', 'subagent-artifacts', 'subagent-runs', 'tasks',
-                 'pi-improver', 'missions', 'history.json', 'package-state.json'}
+                 'pi-improver', 'missions', 'plans', 'powerline-footer', 'web-search-cache',
+                 'history.json', 'package-state.json'}
 
 
 def canonical_path(path):

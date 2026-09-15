@@ -40,7 +40,7 @@ for skill in (root / 'config/skills').glob('*/SKILL.md'):
             assert (skill.parent / reference).exists(), (skill, reference)
 print('JSON, Python syntax, source hygiene, skill references, shared ownership and lock binding: passed')
 PY
-bash -n bootstrap.sh scripts/verify.sh
+bash -n scripts/verify.sh
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 node extensions/web-search/tests/renderers.test.mjs
 node --test tests/*.test.mjs

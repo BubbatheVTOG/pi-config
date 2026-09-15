@@ -1,86 +1,112 @@
-# Personal Pi core
+# pi-config
 
-A complete standalone personal configuration for Pi 0.85.1, with an optional
-explicit overlay. The public core has no private dependencies.
+My personal configuration for the [Pi](https://github.com/earendil-works/pi-coding-agent)
+coding agent: settings, themes, skills, a startup splash, a local web-search
+extension, and the tooling that installs all of it reproducibly.
 
 ![Pi opening screen](docs/assets/pi-config-opening.png)
 
-## Included
+A deliberately busy session showing tasks, subagents, LSP diagnostics, tests, bash
+and web search together:
 
-White default and seven upstream theme fallback snapshots; startup splash; enabled
-pi-lens; VCC; task/question UI; powerline footer; edit/write diffs, thinking labels
-and native user box; boxed text tools; image tools; transcript window; pi-subagents
-with upstream tree/FleetView/async defaults; primary `plan`; canonical `pi-improver`
-and thin `self-optimize` entry point. Personal provider, npm BTW, voice and SearXNG
-are separately owned features, so an overlay can exclude each as a complete unit.
+![Dirty workflow example](docs/assets/pi-config-dirty-workflow.png)
 
-The splash uses the latest tracked overlay implementation with bundled original
-80×26 Pi art, not an unavailable home-directory artwork file. Historical screenshots
-illustrate the UI but are not evidence of current live activation.
+## What's in here
 
-## Safe standalone setup
+| Path | Contents |
+| --- | --- |
+| `manifest.json` | The single source of truth: packages, resources, settings, features |
+| `config/` | Settings, instructions, provider/model templates, skills, theme snapshots, dependency lock |
+| `extensions/splash/` | Startup splash overlay with the bundled 80×26 artwork |
+| `extensions/web-search/` | `web_search` / `fetch_content` / `get_search_content` against a self-hosted SearXNG |
+| `scripts/pi-config.py` | `compose`, `lock`, `prepare`, `diff`, `deploy` — the only entry point |
+| `tests/` | Composition, deployment, rollback and UI regression tests |
+| `docs/composition.md` | How composition, locking, deployment and rollback work |
 
-Prerequisites: installed Pi 0.85.1, Node 24/npm 11, Python 3.12, Git and GNU Stow.
-No global installer is included. Clone using HTTPS, review source and dependencies,
-and run local checks. **Do not run `pi install` against the live target.**
+Features that are personal to my setup (my own model provider, `/btw`, voice,
+SearXNG) are declared as separate features so an overlay repository can exclude
+each one as a unit and add its own resources. This repository stays complete on
+its own and never depends on an overlay.
+
+## Extensions and related projects
+
+| Extension / package | Version | Source | What it does |
+| --- | ---: | --- | --- |
+| `pi-subagents` | 0.68.0 | npm | Delegation, workflows, tree / FleetView widgets |
+| `@nguyenquangthai/pi-ask` | 0.2.0 | npm | Structured question and review dialogs |
+| `@tintinweb/pi-tasks` | 0.9.0 | npm | Task tracking and the `/tasks` widget |
+| `pi-powerline-footer` | 0.17.1 | npm | Powerline status footer |
+| `@narumitw/pi-btw` | 0.58.1 | npm | `/btw` side questions |
+| `pi-lens` | 4.1.6 | npm | LSP diagnostics and AST navigation |
+| `@sting8k/pi-vcc` | 0.7.2 | npm | Transcript-preserving compaction and recall |
+| `pi-tool-display` | 0.5.0 | npm | `edit`/`write` diffs, thinking labels, native user box |
+| `pi-image-tools` | 1.4.0 | npm | Image attachments and previews |
+| `pi-transcript-window` | 0.3.1 | npm | Window over older transcript entries |
+| `pi-boxed-tools` | `9ad64f8d` | [GitHub](https://github.com/BubbatheVTOG/pi-boxed-tools) | Boxed rendering for `read`/`grep`/`find`/`ls`/`bash` |
+| `agent-voice` | `8b32166f` | [GitHub](https://github.com/BubbatheVTOG/agent-voice) | Optional spoken announcements with a footer indicator; off by default |
+| `local-web-search` | local | `extensions/web-search/` | Web tools backed by a SearXNG you run yourself |
+| `splash` | local | `extensions/splash/` | Startup splash |
+| `hyper-term-*` | snapshot | `config/themes/` | Seven theme snapshots; white is the default |
+| `plan`, `pi-improver`, `self-optimize` | local | `config/skills/` | Outcome-first planning; evidence-based Pi improvement |
+
+Projects of mine that this configuration builds on:
+
+- **[pi-boxed-tools](https://github.com/BubbatheVTOG/pi-boxed-tools)** renders the
+  five text tools in the same box style as user messages. `pi-tool-display` keeps
+  the `edit`/`write` diffs, thinking labels and the native user box — the split is
+  intentional and the composer checks that the two don't claim the same renderer.
+- **[OpenCodeHyperTermTheme](https://github.com/BubbatheVTOG/OpenCodeHyperTermTheme)**
+  generates the `hyper-term-*` themes. `config/themes/` is a fallback snapshot so a
+  fresh machine looks right before that repository is cloned.
+- **[agent-voice](https://github.com/BubbatheVTOG/agent-voice)** speaks agent
+  status through a locally installed TTS backend and publishes the `VOICE ON/OFF`
+  footer item. It stays off until you turn it on.
+
+## Setup
+
+Prerequisites: Pi 0.85.1, Node 24 / npm 11, Python 3.12, Git, GNU Stow.
 
 ```bash
+git clone https://github.com/BubbatheVTOG/pi-config.git && cd pi-config
+
+# 1. Check the composition and run the tests (no network, no Pi started).
 python3 scripts/pi-config.py compose
 PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent ./scripts/verify.sh
 
-# Requires a clean committed source tree. Only this explicit candidate step
-# downloads the reviewed dependencies; lifecycle scripts are ignored.
+# 2. Build a frozen generation outside the repository (downloads the locked packages,
+#    lifecycle scripts ignored).
 PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent \
-  python3 scripts/pi-config.py prepare --output /outside/source/generations/personal
+  python3 scripts/pi-config.py prepare --output ~/.local/share/pi-config/generations/1
 
-# Read-only reconciliation; prints changed paths and diffDigest, never values.
+# 3. See what would change in your live Pi directory. Nothing is written.
 python3 scripts/pi-config.py diff \
-  --generation /outside/source/generations/personal \
-  --agent-dir /target/home/.pi/agent --state-dir /outside/source/deployment-state \
-  --home /target/home --project /target/workspace
+  --generation ~/.local/share/pi-config/generations/1 \
+  --agent-dir ~/.pi/agent --state-dir ~/.local/share/pi-config/state \
+  --home ~ --project ~
+
+# 4. Apply exactly the reviewed diff, then /reload in Pi.
+python3 scripts/pi-config.py deploy ...same arguments... --expect <diffDigest from step 3>
 ```
 
-`prepare` uses the public standalone lock under `config/dependencies/`. It never
-starts Pi, a service or an agent. Sources and the resulting generation are disjoint.
-Live settings are local writable copies, so UI writes cannot edit source.
+Deployment links resources from the frozen generation into `~/.pi/agent` and writes
+local, editable copies of `settings.json`, `models.json` and `AGENTS.md`. Redeploying
+reconciles your later edits against the new defaults instead of overwriting them, and
+never touches credentials, sessions or other runtime state. Directories it doesn't
+own make it refuse rather than adopt or delete anything — see
+[docs/composition.md](docs/composition.md) for the rules and for rollback.
 
-Only **after separate deployment approval**, repeat the diff arguments with `deploy`
-and `--expect <reviewed-diffDigest>`. Deployment does not reload Pi. Obtain separate
-reload/restart approval after checking all work is idle. `bootstrap.sh` is now a
-safe compatibility entry point for these explicit commands, not a destructive
-restore script. There is no default live destination and no automatic adoption.
+Credentials never live here: use Pi's local auth store or environment variables.
 
-Existing unmanaged installations intentionally refuse deployment. Do not solve a
-refusal with `rm -rf` or `stow --adopt`. Inventory, classify and resolve ownership
-with the user first. For credentials use environment references or Pi's local auth
-store; never copy secrets into this repository or generation defaults.
-
-## Composition and maintenance
-
-See [composition/deployment](docs/composition.md) for the schema, CLI, union-lock
-procedure, reconciliation and rollback boundaries. [OWNERSHIP.md](OWNERSHIP.md)
-describes source versus local state; [EXTERNAL-REPOS.md](EXTERNAL-REPOS.md) records
-independent owners and machine prerequisites. [AGENTS.md](AGENTS.md) is the maintainer
-contract, including classification before promotion and reviewed public-main workflow.
-
-Generic changes to shared plugins belong in this core. Only environment-specific
-routing/compatibility belongs in an overlay. Do not duplicate shared settings there.
-Missing async UI is not proof of a disabled widget; no such fix is claimed here.
-
-## Tests and trust boundary
+## Tests
 
 ```bash
 PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent \
-PI_CANDIDATE_DEPENDENCIES=/disposable/candidate/dependencies ./scripts/verify.sh
+PI_CANDIDATE_DEPENDENCIES=/path/to/generation/dependencies ./scripts/verify.sh
 ```
 
-Checks cover composition/exclusion/drift, real Stow against synthetic targets,
-rollback preserving later edits/seeds/credential sentinels, no write-through,
-ambient resource refusal, source-owned UI regressions and pinned boxed-tools when
-candidate dependencies are provided. No model, audio or network request is used by
-tests. Package fetching occurs only in explicit `lock`/`prepare` operations.
+Covers composition and feature exclusion, real Stow deployments into throwaway
+targets, rollback with preserved local edits, refusal of unmanaged paths, and renderer
+regressions. Tests never call a model or the network.
 
-Extensions run with the user's full permissions. Declared inventory, static checks
-and no-network mocks are **not a sandbox** or proof about arbitrary plugin behavior.
-Review dynamic registrations, package lifecycle changes and project discovery before
-activation. Credentials, transcripts, logs, caches and generated artifacts remain local.
+Extensions run with your full user permissions; the declared inventory is not a
+sandbox. Review packages before activating them.
