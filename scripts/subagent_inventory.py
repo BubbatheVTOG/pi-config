@@ -147,21 +147,23 @@ def assert_subagent_inventory(agent, home, project, generation, effective_settin
         # The older .agents tree is already refused by the general ambient guard.
         for name in os.environ.get('PI_SUBAGENT_EXTRA_AGENT_DIRS', '').split(os.pathsep):
             if name.strip():
-                definitions(Path(expand(name.strip())), 'agent')
+                # Upstream treats environment roots literally; only settings expand '~'.
+                root = Path(name.strip())
+                definitions(root if root.is_absolute() else project / root, 'agent')
         # Scan the reconciled final settings, not roots that this deployment replaces.
         # Only the new frozen inventory may legitimize a definition.
         if effective_settings is None:
             effective_settings = read_json(Path(generation['path']) / 'defaults/settings.json')
         settings(agent / 'settings.json', effective_settings)
         for directory in (project, *project.parents):
-            if directory == home:
-                break
             package(directory)
             # Include ordinary dependencies conservatively as well as Pi's npm area;
             # normal packages with no agent/chain declarations are not rejected.
             node_modules(directory / 'node_modules')
             node_modules(directory / '.pi/npm/node_modules')
             definitions(directory / '.pi/chains', 'chain')
+            if directory == home:
+                break
         global_root = global_npm_root(home, project)
         if global_root:
             node_modules(global_root)

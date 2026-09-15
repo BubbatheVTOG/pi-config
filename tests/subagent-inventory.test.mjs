@@ -13,9 +13,9 @@ const oracle = fileURLToPath(new URL('./pinned-agent-discovery.mjs', import.meta
 const prompt = '---\nname: reviewer\ndescription: Synthetic project override\n---\nInspect only synthetic examples.\n';
 const chain = { name: 'example-chain', description: 'Synthetic chain', chain: [{ agent: 'reviewer', task: 'Inspect a synthetic example' }] };
 
-function fixture(run) {
+function fixture(run, { projectIsHome = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'pi-agent-inventory-'));
-  const home = join(root, 'home'), project = join(root, 'project'), agent = join(home, '.pi/agent');
+  const home = join(root, 'home'), project = projectIsHome ? home : join(root, 'project'), agent = join(home, '.pi/agent');
   const generation = join(root, 'generation'), state = join(root, 'state');
   const put = (path, value) => {
     mkdirSync(dirname(path), { recursive: true });
@@ -134,6 +134,28 @@ for (const route of ['settings', 'environment', 'default-user', 'user-chain']) {
         assert.equal(discover().chains.find(c => c.name === 'example-chain').filePath, path);
       } else assert.equal(discover().agents.find(a => a.name === 'reviewer').filePath, path);
       refused(scan());
+      refused(plan());
+    });
+  });
+}
+
+test('HOME project package definitions match pinned discovery and are refused', { skip: !deps }, () => {
+  fixture(({ project, put, discover, plan, refused }) => {
+    put(join(project, 'package.json'), { name: 'synthetic-home', pi: { subagents: { agents: ['./custom-agents'] } } });
+    const path = join(project, 'custom-agents/reviewer.md');
+    put(path, prompt);
+    assert.equal(discover().agents.find(a => a.name === 'reviewer').filePath, path);
+    refused(plan());
+  }, { projectIsHome: true });
+});
+
+for (const directory of ['~/agents', 'relative/agents']) {
+  test(`literal extra-agent directory ${directory} matches pinned discovery`, { skip: !deps }, () => {
+    fixture(({ project, put, env, discover, plan, refused }) => {
+      const path = join(project, directory, 'reviewer.md');
+      put(path, prompt);
+      env.PI_SUBAGENT_EXTRA_AGENT_DIRS = directory;
+      assert.equal(discover().agents.find(a => a.name === 'reviewer').filePath, path);
       refused(plan());
     });
   });
