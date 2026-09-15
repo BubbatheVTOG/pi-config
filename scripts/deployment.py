@@ -119,6 +119,7 @@ def verify_generation(path):
 def resource_inventory(output):
     pi_root = os.environ.get('PI_CODING_AGENT_ROOT')
     require(pi_root, 'PI_CODING_AGENT_ROOT is required for version-bound filesystem discovery preflight')
+    assert pi_root is not None
     script = Path(__file__).parent / 'resource-inventory.mjs'
     with tempfile.TemporaryDirectory(prefix='pi-inventory-') as tmp:
         env = {'PATH': os.environ['PATH'], 'HOME': tmp, 'PI_OFFLINE': '1', 'PI_CODING_AGENT_DIR': tmp + '/agent'}
@@ -174,6 +175,8 @@ def prepare(composed, origins, output, lock):
                 else:
                     shutil.copy2(source, target)
                 if 'source' in value:
+                    root = origins['resources', name]
+                    expected_files = composed['sourceFiles'][str(root)]
                     for p in source_files:
                         copied = target / p.relative_to(source) if source.is_dir() else target
                         require(digest(copied.read_bytes()) == expected_files[str(p.relative_to(root))], 'source changed while copying')
@@ -368,11 +371,14 @@ def deployment_plan(generation, agent, state, home, project):
         effective_config(name, result, desired, read_json(generation / 'defaults' / 'models.json'))
         if name == 'settings.json' and result is not MISSING:
             import json
+            assert isinstance(result, bytes)
             effective_settings = json.loads(result)
         if desired is not MISSING:
+            assert isinstance(desired, bytes)
             defaults[name] = base64.b64encode(desired).decode()
         elif modes.get(name) == 'seed' and previous is not MISSING:
             # Retired seed ownership remains local; never recreate or delete it.
+            assert isinstance(previous, bytes)
             defaults[name] = base64.b64encode(previous).decode()
         if result != current:
             changes[name] = result
