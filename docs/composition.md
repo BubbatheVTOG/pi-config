@@ -186,7 +186,11 @@ Reconciliation compares old-generated, current and new-generated:
 - resource package/path lists and renderer ownership cannot drift locally;
 - default and subagent model references must remain in effective inventory;
 - existing unowned singletons refuse, even if their bytes happen to match;
-- seeds are not overwritten; auth and runtime state are not read or captured.
+- seeds are not overwritten; auth and runtime state, including subagent missions,
+  are not read or captured;
+- Pi's automatic `lastChangelogVersion` metadata is preserved locally when it is
+  a valid version string; it is not promoted into source defaults. Other unknown
+  settings keys still require review.
 
 Roll back by diffing/deploying an earlier intact generation through the **same**
 three-way comparison. Never restore a stale settings backup over later edits or

@@ -332,6 +332,46 @@ class CompositionTests(unittest.TestCase):
         self.assertEqual(read_json(self.agent / 'seed.json')['local'], 'preserve')
         self.assertEqual((self.agent / 'auth.json').read_bytes(), b'fictional credential sentinel')
 
+    def test_mission_history_survives_redeployment_and_rollback(self):
+        one = self.generation('one')
+        self.activate_fixture(one)
+        history = self.agent / 'missions/projects/example/mission.json'
+        put(history, {'status': 'completed', 'summary': 'Preserve local runtime history'})
+        original = history.read_bytes()
+        put(self.core / 'plugin.json', {'enabled': False, 'size': 8})
+        commit(self.core)
+        two = self.generation('two')
+        self.activate_fixture(two)
+        self.assertEqual(history.read_bytes(), original)
+        self.activate_fixture(one)
+        self.assertEqual(history.read_bytes(), original)
+        self.assertNotIn('missions', read_json(self.state / 'receipt.json')['baseline'])
+        put(self.agent / 'unknown-runtime/item.json', {})
+        with self.assertRaisesRegex(Refusal, 'unmanaged target'):
+            self.plan(one)
+
+    def test_pi_changelog_metadata_stays_local_across_redeployment(self):
+        one = self.generation('one')
+        self.activate_fixture(one)
+        settings = self.agent / 'settings.json'
+        value = read_json(settings)
+        value['lastChangelogVersion'] = '0.85.1'
+        put(settings, value)
+        put(self.core / 'plugin.json', {'enabled': False, 'size': 8})
+        commit(self.core)
+        two = self.generation('two')
+        self.activate_fixture(two)
+        self.assertEqual(read_json(settings)['lastChangelogVersion'], '0.85.1')
+        self.activate_fixture(one)
+        self.assertEqual(read_json(settings)['lastChangelogVersion'], '0.85.1')
+        self.assertNotIn('lastChangelogVersion', read_json(one / 'defaults/settings.json'))
+        value = read_json(settings)
+        value['lastChangelogVersion'] = {'unknown': 'not a version'}
+        put(settings, value)
+        with self.assertRaisesRegex(Refusal, 'changelog metadata'):
+            self.plan(one)
+        self.assertEqual(read_json(settings), value)
+
     def test_conflicts_refuse_before_mutation(self):
         one = self.generation('one')
         self.activate_fixture(one)

@@ -5,6 +5,7 @@ import base64
 import fcntl
 import io
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -21,7 +22,7 @@ from composition import (Refusal, anchored, binding, check_lock, compose, depend
 MISSING = object()
 RUNTIME_NAMES = {'auth.json', 'trust.json', 'sessions', 'cache', 'logs', 'models-cache',
                  'models-store.json', 'subagent-artifacts', 'subagent-runs', 'tasks',
-                 'pi-improver', 'history.json', 'package-state.json'}
+                 'pi-improver', 'missions', 'history.json', 'package-state.json'}
 
 
 def canonical_path(path):
@@ -208,7 +209,7 @@ def merge(old, current, new, path=''):
     if new == old or current == new:
         return current
     if all(isinstance(x, dict) for x in (old, current, new)):
-        require(current.keys() <= old.keys() | new.keys(), f'unknown local JSON keys: {path}')
+        known_keys(old, current, new, path)
         result = {}
         for key in sorted(old.keys() | current.keys() | new.keys()):
             value = merge(old.get(key, MISSING), current.get(key, MISSING), new.get(key, MISSING), path + '/' + key)
@@ -222,6 +223,11 @@ def known_keys(old, current, new, path):
     if not isinstance(current, dict):
         return
     allowed = {**(old if isinstance(old, dict) else {}), **(new if isinstance(new, dict) else {})}
+    if path == 'settings.json' and 'lastChangelogVersion' in current:
+        version = current['lastChangelogVersion']
+        require(isinstance(version, str) and len(version) <= 64
+                and re.fullmatch(r'\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?', version), 'invalid local changelog metadata')
+        allowed['lastChangelogVersion'] = version
     require(current.keys() <= allowed.keys(), f'unknown local JSON keys: {path}')
     for key, value in current.items():
         known_keys(old.get(key, MISSING) if isinstance(old, dict) else MISSING, value,
