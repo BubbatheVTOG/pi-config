@@ -62,9 +62,23 @@ Projects of mine that this configuration builds on:
   status through a locally installed TTS backend and publishes the `VOICE ON/OFF`
   footer item. It stays off until you turn it on.
 
-## Setup
+## Platforms and prerequisites
 
-Prerequisites: Pi 0.85.1, Node 24 / npm 11, Python 3.12, Git, GNU Stow.
+Required: Pi **0.85.1** exactly (the composer refuses other versions), Node 24 / npm 11,
+Python ≥ 3.12, Git, GNU Stow. Nothing here depends on a distribution: no package
+manager, no fixed system paths, no architecture assumptions. The npm lock is a
+cross-platform union (Linux/macOS/Windows, x64/arm64) and `prepare` installs only
+the entries for the host.
+
+Optional, detected at runtime and never required: `img2sixel` (libsixel) for inline
+image previews, `shellcheck`/`shfmt` for the shell-script checks. Terminal features
+(themes, splash, footer glyphs) depend on the terminal, not the OS.
+
+Verified on Ubuntu 24.04 x86_64. Fedora and Arch are expected to work unchanged;
+run `scripts/verify.sh` and a `prepare` into a throwaway directory as the first
+check on a new machine — neither touches `~/.pi`.
+
+## Setup
 
 ```bash
 git clone https://github.com/BubbatheVTOG/pi-config.git && cd pi-config
