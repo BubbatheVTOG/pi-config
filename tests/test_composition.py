@@ -12,7 +12,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from composition import (KINDS, Refusal, binding, check_lock, compose, dependency_manifest,
                          digest, encoded, read_json, validate)
-from deployment import (MISSING, deploy, deployment_plan, external, merge, plan_digest,
+from deployment import (MISSING, deploy, deployment_plan, external, make_lock, merge, plan_digest,
                         prepare, verify_generation)
 
 
@@ -35,6 +35,9 @@ def entry(value, feature='base', **kw):
 
 class CompositionTests(unittest.TestCase):
     def setUp(self):
+        self.discovery_env = patch.dict(os.environ, {'PI_OFFLINE': '1', 'PI_SUBAGENT_EXTRA_AGENT_DIRS': ''})
+        self.discovery_env.start()
+        self.addCleanup(self.discovery_env.stop)
         self.tmp = tempfile.TemporaryDirectory(prefix='pi-config-test-')
         self.root = Path(self.tmp.name)
         self.core = self.root / 'core'
@@ -184,6 +187,107 @@ class CompositionTests(unittest.TestCase):
             self.composed()
         with self.assertRaisesRegex(Refusal, 'outside'):
             external(self.core / 'generation', [self.core])
+
+    def test_parent_traversal_and_source_aliases_refuse_before_any_writes(self):
+        c, origins = self.composed()
+        lock = self.lock(c)
+        outside = self.root / 'outside'
+        outside.mkdir()
+        alias = outside / '../core/generated'
+        for operation in (lambda: external(alias, [self.core]),
+                          lambda: make_lock(c, alias),
+                          lambda: prepare(c, origins, alias, lock)):
+            with self.subTest(operation=operation), patch('deployment.npm_run') as npm:
+                with self.assertRaisesRegex(Refusal, 'parent traversal'):
+                    operation()
+                npm.assert_not_called()
+                self.assertFalse((self.core / 'generated').exists())
+        symlink = self.root / 'source-alias'
+        symlink.symlink_to(self.core, target_is_directory=True)
+        with self.assertRaisesRegex(Refusal, 'linked destination ancestor'):
+            make_lock(c, symlink / 'generated')
+        self.assertFalse((self.core / 'generated').exists())
+
+    def test_agent_state_overlap_aliases_refuse_without_creating_state(self):
+        gen = self.generation('one')
+        for agent, state in [(self.root / 'target', self.root / 'outside/../target/state'),
+                             (self.root / 'outside/../state/agent', self.state),
+                             (self.agent, self.root / 'outside/../core/state'),
+                             (self.root / 'target', self.root / 'target/state')]:
+            with self.subTest(agent=agent, state=state):
+                with self.assertRaisesRegex(Refusal, 'parent traversal|state must be outside target'):
+                    deploy(gen, agent, state, self.home, self.project, 'unreviewed')
+                self.assertFalse(state.exists())
+                self.assertFalse(agent.exists())
+        linked = self.root / 'target-alias'
+        linked.symlink_to(self.core, target_is_directory=True)
+        with self.assertRaisesRegex(Refusal, 'linked destination ancestor'):
+            deploy(gen, linked / 'agent', self.state, self.home, self.project, 'unreviewed')
+        self.assertFalse(self.state.exists())
+        self.assertFalse((self.core / 'agent').exists())
+
+    def test_standalone_executable_data_survives_freeze_and_mode_drift_is_detected(self):
+        script = b'#!/bin/sh\n[ "$1" = --help ] && printf "synthetic help\\n"\n'
+        put(self.core / 'helper', script)
+        (self.core / 'helper').chmod(0o755)
+        put(self.core / 'helpers/nested', script)
+        (self.core / 'helpers/nested').chmod(0o755)
+        self.manifest['entries']['resources']['helper'] = entry({'source': 'helper', 'type': 'data'})
+        self.manifest['entries']['resources']['helpers'] = entry({'source': 'helpers', 'type': 'data'})
+        self.save()
+        gen = self.generation('one')
+        for name in ('helper', 'helpers/nested'):
+            generated = gen / 'stow/agent/managed' / name
+            result = subprocess.run([str(generated), '--help'], check=True, capture_output=True, text=True)
+            self.assertEqual(result.stdout, 'synthetic help\n')
+            self.assertEqual(generated.stat().st_mode & 0o777, 0o555)
+        verify_generation(gen)
+        (gen / 'stow/agent/managed/helper').chmod(0o444)
+        with self.assertRaisesRegex(Refusal, 'generation has changed'):
+            verify_generation(gen)
+
+    def test_discovery_uses_reconciled_settings_not_replaced_scan_roots(self):
+        extra = self.root / 'extra-agents'
+        extra.mkdir()
+        self.manifest['entries']['settings']['/subagents/agentScanDirs'] = entry([str(extra)])
+        self.save()
+        one = self.generation('one')
+        self.activate_fixture(one)
+        put(extra / 'reviewer.md', b'---\nname: reviewer\ndescription: Synthetic override\n---\nExample.')
+        with self.assertRaisesRegex(Refusal, 'unmanaged subagent agent definition'):
+            self.plan(one)
+        self.manifest['entries']['settings']['/subagents/agentScanDirs'] = entry([])
+        self.save()
+        two = self.generation('two')
+        # The approved new defaults remove this input before activation.
+        self.activate_fixture(two)
+        self.assertEqual(self.plan(two)[3], {})
+        with patch.dict(os.environ, {'PI_SUBAGENT_EXTRA_AGENT_DIRS': str(extra)}):
+            with self.assertRaisesRegex(Refusal, 'unmanaged subagent agent definition'):
+                self.plan(two)
+
+    def test_global_npm_uncertainty_refuses_and_runtime_mode_is_bound(self):
+        gen = self.generation('one')
+        offline_plan = self.plan(gen)
+        global_root = self.root / 'global-node-modules'
+        global_root.mkdir()
+        with patch.dict(os.environ, {'PI_OFFLINE': '0'}):
+            for result in ['relative/path\n', str(global_root) + '\n' + str(self.root / 'another-root') + '\n']:
+                with patch('subagent_inventory.subprocess.check_output', return_value=result):
+                    with self.assertRaisesRegex(Refusal, 'ambiguous global npm root'):
+                        self.plan(gen)
+            with patch('subagent_inventory.subprocess.check_output', side_effect=subprocess.TimeoutExpired('npm', 5)):
+                with self.assertRaisesRegex(Refusal, 'cannot establish global npm'):
+                    self.plan(gen)
+            with patch('subagent_inventory.subprocess.check_output', return_value=str(global_root) + '\n') as command:
+                online_plan = self.plan(gen)
+                self.assertNotEqual(plan_digest(offline_plan), plan_digest(online_plan))
+                self.assertEqual(command.call_args.kwargs['env']['HOME'], str(self.home))
+                self.assertEqual(command.call_args.kwargs['stderr'], subprocess.DEVNULL)
+                with self.assertRaisesRegex(Refusal, 'diff drift'):
+                    deploy(gen, self.agent, self.state, self.home, self.project, plan_digest(offline_plan))
+        self.assertFalse(self.state.exists())
+        self.assertFalse(self.agent.exists())
 
     def test_core_input_drift_invalidates_overlay_and_lock(self):
         c, _ = self.composed()

@@ -133,7 +133,11 @@ JSON values, relative to that package root. Do not expand them relative to setti
 `prepare` requires clean inputs, a bound lock and a new output path outside both
 repositories. It installs dependencies, copies selected resources, writes defaults,
 records an inventory and marks the tree read-only. A generation cannot be moved:
-settings use anchored absolute paths. Integrity is rechecked before diff/deploy.
+settings use anchored absolute paths. Parent-traversal (`..`) and symlink-ancestor
+aliases are refused for generation, target and state paths before writes; containment
+and target/state disjointness use canonical paths. Immutable single files and trees
+preserve executable intent before read-only freezing. Integrity checks include that
+executable intent and are rerun before diff/deploy.
 Set `PI_CODING_AGENT_ROOT` to the installed Pi package. A Pi-0.85.1-bound adapter
 runs only Pi's filesystem resource discovery in an isolated temporary home, using
 the exact package filters; it records discovered paths and checks skill/prompt/theme
@@ -145,8 +149,26 @@ an accident guard, not a security sandbox.
 `--project`. It is read-only and prints changed paths, preserved files and a
 `diffDigest`, never local values. It inspects the intended working directory's
 ancestor Pi/agent discovery paths and the target user's shared skill root; unknown
-resources fail. Run it for the actual deployment home/project, not fictional paths.
-Changing cwd or using future CLI resource flags requires another inventory review.
+resources fail. The pi-subagents 0.68 inventory also inspects root/package declarations
+(`pi-subagents` and `pi.subagents` agents/chains), scoped and unscoped npm packages,
+settings package sources, user/default agent and chain roots, `.pi/chains`,
+`subagents.agentScanDirs` (including its supported single-directory wildcard), and
+`PI_SUBAGENT_EXTRA_AGENT_DIRS`. Ordinary dependencies without declarations are allowed;
+unowned definition candidates and unreadable/malformed discovery inputs refuse.
+The scan is conservative across project ancestors and ordinary `node_modules` too;
+exclusion settings do not authorize otherwise unowned definitions.
+
+Unless `PI_OFFLINE` is `1`, `true` or `yes` (case-insensitive, matching upstream),
+preflight uses a bounded read-only `npm root -g` with the intended target HOME/PATH
+and npm environment, then inspects relevant package metadata there. Timeout or
+ambiguous output refuses, with npm stderr suppressed. No package code is executed,
+no network/install is requested, and no prompt bodies are read by this scan. Offline
+mode, resolved global root, PATH and extra-agent roots are bound into the reviewed
+diff digest. Use the **same intended runtime mode/environment** at preflight and
+activation; offline tests do not certify omitted global resources for online use.
+Run it for the actual deployment home/project, not fictional paths. Changing cwd,
+mode, discovery environment or future CLI resource flags requires another inventory
+review. This does not sandbox arbitrary future project or plugin behavior.
 
 `deploy` requires the same arguments plus `--expect <diffDigest>` after deployment
 approval. A local lock serializes deployments; the digest and per-file checks catch

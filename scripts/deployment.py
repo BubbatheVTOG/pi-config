@@ -13,6 +13,7 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
+from subagent_inventory import assert_subagent_inventory
 from composition import (Refusal, anchored, binding, check_lock, compose, dependency_manifest, digest,
                          encoded, files, read_json, relative, require, validate)
 
@@ -23,11 +24,18 @@ RUNTIME_NAMES = {'auth.json', 'trust.json', 'sessions', 'cache', 'logs', 'models
                  'pi-improver', 'history.json', 'package-state.json'}
 
 
-def external(path, roots):
+def canonical_path(path):
     path = Path(path).absolute()
+    require('..' not in path.parts, 'parent traversal is not allowed in deployment paths')
     for parent in (path, *path.parents):
         require(not parent.is_symlink(), f'linked destination ancestor: {parent}')
+    return path.resolve()
+
+
+def external(path, roots):
+    path = canonical_path(path)
     for root in roots:
+        root = canonical_path(root)
         require(not path.is_relative_to(root) and not root.is_relative_to(path), 'deployment/state must be outside and disjoint from source roots')
     return path
 
@@ -54,6 +62,7 @@ def npm_run(target, args):
 
 
 def make_lock(composed, output):
+    output = external(output, composed['roots'].values())
     output.mkdir(parents=True, exist_ok=False)
     write(output / 'package.json', encoded(dependency_manifest(composed)))
     npm_run(output, ['install', '--package-lock-only'])
@@ -93,7 +102,7 @@ def tree_inventory(root):
 
 
 def verify_generation(path):
-    require(not path.is_symlink(), 'linked generation refused')
+    path = canonical_path(path)
     require((path / 'generation.json').is_file() and not (path / 'generation.json').is_symlink(), 'missing/linked generation receipt')
     receipt = read_json(path / 'generation.json')
     inventory = tree_inventory(path)
@@ -115,6 +124,7 @@ def resource_inventory(output):
 
 
 def prepare(composed, origins, output, lock):
+    output = external(output, composed['roots'].values())
     check_lock(composed, lock)
     output.mkdir(parents=True, exist_ok=False)
     deps = output / 'dependencies'
@@ -158,7 +168,7 @@ def prepare(composed, origins, output, lock):
                 if source.is_dir():
                     shutil.copytree(source, target)
                 else:
-                    shutil.copyfile(source, target)
+                    shutil.copy2(source, target)
                 if 'source' in value:
                     for p in source_files:
                         copied = target / p.relative_to(source) if source.is_dir() else target
@@ -271,7 +281,7 @@ def ambient(home, project):
     for directory in (project, *project.parents):
         candidates += [directory / '.agents']
         pi = directory / '.pi'
-        candidates += [pi / 'agents', pi / 'subagent', directory / 'AGENTS.override.md']
+        candidates += [pi / 'agents', pi / 'chains', pi / 'subagent', directory / 'AGENTS.override.md']
         candidates += [pi / n for n in ('settings.json', 'extensions', 'skills', 'prompts', 'themes', 'SYSTEM.md', 'APPEND_SYSTEM.md')]
     return sorted(set(candidates))
 
@@ -299,6 +309,7 @@ def assert_inventory(agent, home, project, old, new):
 
 
 def deployment_plan(generation, agent, state, home, project):
+    generation, agent, state, home, project = map(canonical_path, (generation, agent, state, home, project))
     new = verify_generation(generation)
     for path in (agent, state):
         external(path, [Path(p) for p in new['roots']] + [generation])
@@ -329,6 +340,7 @@ def deployment_plan(generation, agent, state, home, project):
             require(not p.is_symlink(), f'linked target ancestor: {rel}')
             require(not p.exists() or p.is_dir(), f'unowned target collision: {rel}')
     defaults, changes, before = {}, {}, {}
+    effective_settings = read_json(generation / 'defaults/settings.json')
     modes = new['modes'].copy()
     for name, mode in old.get('modes', {}).items():
         if mode == 'seed':
@@ -345,6 +357,9 @@ def deployment_plan(generation, agent, state, home, project):
             require(previous is not MISSING or current is MISSING, f'unowned singleton: {name}')
             result = reconcile(previous, current, desired, name)
         effective_config(name, result, desired, read_json(generation / 'defaults' / 'models.json'))
+        if name == 'settings.json' and result is not MISSING:
+            import json
+            effective_settings = json.loads(result)
         if desired is not MISSING:
             defaults[name] = base64.b64encode(desired).decode()
         elif modes.get(name) == 'seed' and previous is not MISSING:
@@ -352,8 +367,9 @@ def deployment_plan(generation, agent, state, home, project):
             defaults[name] = base64.b64encode(previous).decode()
         if result != current:
             changes[name] = result
+    discovery = assert_subagent_inventory(agent, home, project, new, effective_settings)
     receipt = {'schema': 1, 'generation': str(generation), 'agent': str(agent),
-               'baseline': defaults, 'links': links, 'modes': modes}
+               'baseline': defaults, 'links': links, 'modes': modes, 'discovery': discovery}
     return new, old, receipt, changes, before
 
 
@@ -370,6 +386,7 @@ def deploy(generation, agent, state, home, project, expected):
     # An explicit diff digest is required; concurrent writers are detected again
     # before mutation. The lock coordinates deployments, not arbitrary Pi writes.
     # Validate locations before even creating the state directory/lock.
+    generation, agent, state, home, project = map(canonical_path, (generation, agent, state, home, project))
     initial = deployment_plan(generation, agent, state, home, project)
     require(plan_digest(initial) == expected, 'deployment diff drift; review a fresh diff')
     state.mkdir(parents=True, exist_ok=True, mode=0o700)
