@@ -55,7 +55,8 @@ The bootstrap script:
 
 1. verifies that `pi` is available
 2. installs the pinned npm and Git packages from `config/packages.txt`
-3. installs the saved settings, models, themes, skills, and local extensions
+3. symlinks saved settings, models, themes, skills, and local extensions back
+   to this repository so live files cannot silently drift
 4. installs the `pi-tool-display` ownership split
 5. prints the environment variables still required by the provider config
 
@@ -75,7 +76,8 @@ Do not put that value into `config/models.json`, shell history, or this repo.
 
 The exact pinned package list is in [`config/packages.txt`](config/packages.txt).
 External repositories and machine integrations are documented in
-[`EXTERNAL-REPOS.md`](EXTERNAL-REPOS.md).
+[`EXTERNAL-REPOS.md`](EXTERNAL-REPOS.md). Ownership boundaries and live-path
+symlink policy are documented in [`OWNERSHIP.md`](OWNERSHIP.md).
 
 The local web-search extension uses a SearXNG service at
 `http://127.0.0.1:8080` by default. Its source is included under
@@ -85,7 +87,7 @@ repository.
 ### Installed extension inventory
 
 | Extension/package | Version | Source | Purpose |
-|---|---:|---|---|
+| --- | ---: | --- | --- |
 | `pi-subagents` | 0.68.0 | npm | Delegation and multi-agent workflows |
 | `@nguyenquangthai/pi-ask` | 0.2.0 | npm | Structured question/review dialogs |
 | `@tintinweb/pi-tasks` | 0.9.0 | npm | Task tracking and `/tasks` widget |

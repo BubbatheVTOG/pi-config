@@ -4,7 +4,10 @@ set -euo pipefail
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT"
 
-command -v jq >/dev/null || { echo "missing jq" >&2; exit 1; }
+command -v jq >/dev/null || {
+  echo "missing jq" >&2
+  exit 1
+}
 
 jq empty config/settings.json
 jq empty config/models.json
@@ -15,7 +18,7 @@ jq empty extensions/pi-tool-display/config.json
 if find . -type f \( \
   -name '*.log' -o -name 'auth.json' -o -name '.env' -o -name '.env.*' \
   -o -name '*.key' -o -name '*.pem' -o -name '*credentials*' -o -name '*token*' \
-\) -not -path './.git/*' -print -quit | grep -q .; then
+  \) -not -path './.git/*' -print -quit | grep -q .; then
   echo "forbidden log/credential-like file found" >&2
   exit 1
 fi
