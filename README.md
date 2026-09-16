@@ -56,6 +56,23 @@ Pi stores global packages under `~/.pi/agent/npm/` and `~/.pi/agent/git/`.
 Local runtime state, credentials, sessions, caches, and backups are deliberately
 outside this repository.
 
+## Work machine
+
+`config/settings.work.json` holds the only work-specific differences: the startup
+provider/model and the private skill paths. It is a delta, not a full settings
+file. On a work machine, after installing the baseline:
+
+```bash
+jq -s '.[0] * .[1]' ~/.pi/agent/settings.json config/settings.work.json > /tmp/s.json \
+  && mv /tmp/s.json ~/.pi/agent/settings.json
+pi install <your Duo provider package source>
+```
+
+The Duo provider, its model catalog, and the private skills live in their own
+repositories; credentials stay in the environment or `~/.pi/agent/auth.json`.
+If a machine still has the legacy `~/.pi/agent/extensions/agent-voice` symlink
+from the old `install.sh`, remove the symlink (keep the repo) or voice loads twice.
+
 ## Backups
 
 Before substantial changes, back up `~/.pi/agent/` to a private local backup

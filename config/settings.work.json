@@ -1,0 +1,26 @@
+{
+  "defaultProvider": "gitlab-duo",
+  "defaultModel": "gpt-6-astra",
+  "skills": [
+    "~/git/agent-skills/address-mr-comments",
+    "~/git/agent-skills/angular-refactoring",
+    "~/git/agent-skills/angular-unit-test-coverage",
+    "~/git/agent-skills/artifactory-api",
+    "~/git/agent-skills/ast-grep-structural-refactoring",
+    "~/git/agent-skills/atlassian-content-sync",
+    "~/git/agent-skills/develop-angular-feature",
+    "~/git/agent-skills/dynatrace-api",
+    "~/git/agent-skills/grilling",
+    "~/git/agent-skills/jira-board-cli",
+    "~/git/agent-skills/mermaid-diagram-generator",
+    "~/git/agent-skills/mma-support-assistant",
+    "~/git/agent-skills/openapi-annotation-audit",
+    "~/git/agent-skills/postman-collection-cleanup",
+    "~/git/agent-skills/shellcheck-shfmt-shell-quality",
+    "~/git/agent-skills/skill-maintainer",
+    "~/git/agent-skills/sonarqube-issue-triage",
+    "~/git/agent-skills/ticket-and-mr",
+    "~/git/agent-skills/ticket-to-mr",
+    "~/git/agent-skills/loop-engineering"
+  ]
+}
