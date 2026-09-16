@@ -36,7 +36,7 @@ pi update --extensions
 The current custom bash renderer is installed natively as:
 
 ```text
-git:github.com/BubbatheVTOG/pi-boxed-tools@5e3aea2
+git:github.com/BubbatheVTOG/pi-boxed-tools@2262c69
 ```
 
 Voice and the local/cloud toggle are native Git packages pinned in
