@@ -64,62 +64,15 @@ listed by `pi list`. Local extensions and skills are loaded from `~/.pi/agent/`.
   Themes are the `hyper-term-*` set in `~/.pi/agent/themes/`; they hot-reload.
   `/reload` picks up changes to extensions, skills, prompts, themes, and context files.
 
-## Subagents and model selection
+## Subagents
 
-**Subagents exist — use them when the work is the right shape for one.** Reach for delegation
-when the task is parallelizable, benefits from a second opinion, is read-only recon, or is a
-mechanical edit against a clear spec. Don't delegate trivial one-step operations, single-file
-edits, or anything that needs the full conversation to be safe.
+**Use subagents when the work benefits from delegation.** Good fits include codebase recon,
+research, independent review, parallel checks, and mechanical edits with a clear spec. Do not
+delegate trivial one-step operations or work where the child lacks the context to be safe.
 
-- Good fits: codebase recon before planning, reviewing a diff, researching a claim,
-  independent second opinion on a risky decision, running several checks in parallel.
-- Bad fits: "rename this variable", answering from context you already have, anything where
-  a wrong guess is expensive and the child lacks the context to catch it.
-
-**Pick the cheapest model that will reliably do the job.** Model choice is the main agent's
-discretion, not a fixed default — a summarization pass does not need a frontier model, and a
-subtle multi-file refactor does. Thinking level matters about as much as the model: low for
-recon and extraction, medium or high for implementation and review.
-
-`opencode-go` catalog as of 2026-09-08, $/million tokens (input / output). Models and prices
-move — refresh this table from `~/.pi/agent/models-store.json` during `/skill:self-optimize` passes:
-
-| Tier | Models | Use for |
-| ---- | ------ | ------- |
-| Cheap | `glm-5.3-flash` 0.075/0.25 · `hy3` 0.14/0.58 · `qwen3.8-flash` 0.15/0.47 · `gpt-5.6-luna` 0.20/1.20 | summarising, classifying, extracting, recon, lookups, mechanical edits |
-| Mid | `minimax-m3` 0.30/1.20 · `qwen3.7-plus` 0.40/1.60 | routine multi-file implementation, focused reviews, most delegation |
-| Strong | `hy4-preview` 0.83/2.50 · `kimi-k2.7-code` 0.95/4.00 · `glm-5.3` 1.40/4.40 · `grok-4.6` 2.00/6.00 · `kimi-k3` 3.00/15.00 | hard or ambiguous implementation, architecture, subtle bugs, judgment calls |
-
-The session and subagent default is local `vllm/bubba` (free, 256k ctx, reasoning) — cloud
-tiers above are only for explicit escalation with a per-run `model:` override.
-
-How to set it, strongest precedence first: per-run `model` on the `subagent` call →
-`subagents.agentOverrides.<name>.model` → agent frontmatter `model:` →
-`subagents.defaultModel` → the parent session model. Use `model: "inherit"` to take the
-parent session model explicitly.
-
-Not usable here: `deepseek-v4-flash` and `deepseek-v4-pro` return `403 RegionError` on this
-opencode-go account (verified 2026-09-08) — do not pin them.
-
-Baseline pins live in `~/.pi/agent/settings.json` → `subagents.agentOverrides`. The local
-`vllm/bubba` model is the normal default; `researcher` has inherited tools and `oracle` uses
-high thinking. **These are a floor, not a rule.** The main agent decides at runtime: pass
-`model:` on the call when a task needs more (or less) than the baseline, and re-tier when the
-catalog changes. There is no automatic fallback model; recover from a provider failure by
-re-launching with an explicit `model:` override.
-
-## This machine
-
-- **GPU**: RTX 3090 (passthrough setup documented in `~/git/QEMU-3090-Passthrough`).
-- **Local inference**: vLLM at `https://ai.xorro.tech/v1`, model id `bubba` — 256k context,
-  reasoning, `xhigh` thinking. Configured in pi as provider `vllm` in `~/.pi/agent/models.json`
-  and in opencode as provider `vllm`.
-- **Search**: SearXNG in Docker on `127.0.0.1:8080` (compose: `~/docker/searxng`,
-  settings `~/docker/searxng/searxng/settings.yml`, JSON format enabled).
-- **Other Docker services**: `n8n` on :5678, `lmfarm-postgres-1` on :5432, `hawser-agent`,
-  `watch_tower`.
-- Shell is zsh; dotfiles are symlinked from `~/git/sigint/dotfiles`. `mise` manages runtimes.
-- Git identity is set globally; `delta` is the pager.
+Choose a model and thinking level appropriate to the task. Keep model names, provider defaults,
+pricing, and fallback behavior in Pi's live settings and package documentation rather than in
+this general instruction file.
 
 ## Coding Principles and Rules
 
