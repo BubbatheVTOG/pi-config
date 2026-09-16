@@ -39,6 +39,19 @@ The current custom bash renderer is installed natively as:
 git:github.com/BubbatheVTOG/pi-boxed-tools@5e3aea2
 ```
 
+Voice and the local/cloud toggle are native Git packages pinned in
+`config/settings.json`. Their code and tests stay in their owning repositories:
+
+- [agent-voice](https://github.com/BubbatheVTOG/agent-voice)
+- [pi-local-cloud-toggle](https://github.com/BubbatheVTOG/pi-local-cloud-toggle)
+
+Do not also copy or link these extensions into `~/.pi/agent/extensions/`.
+Voice remains inactive without its executable backend; the toggle registers no
+controls without an enabled, available local model. Neither guard starts a
+backend or installs missing prerequisites. Backend presence does not prove that
+playback or inference will succeed. Review and publish plugin fixes in their
+own repositories before updating the pins here.
+
 Pi stores global packages under `~/.pi/agent/npm/` and `~/.pi/agent/git/`.
 Local runtime state, credentials, sessions, caches, and backups are deliberately
 outside this repository.

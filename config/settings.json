@@ -15,7 +15,8 @@
     "git:github.com/BubbatheVTOG/pi-boxed-tools@5e3aea2bf8e9d641c42b9912c94e5f9cfefaf3c9",
     "npm:pi-image-tools@1.4.0",
     "npm:pi-transcript-window@0.3.1",
-    "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@a5381780f204f1975bd64a64678619464b1c34a1"
+    "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@dbec6f20c193f063328f6747938a355c8b81d145",
+    "git:github.com/BubbatheVTOG/agent-voice@d832560b90a022a534648014e6acedaf113ef4fe"
   ],
   "powerline": {
     "customItems": [
