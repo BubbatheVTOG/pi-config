@@ -42,7 +42,7 @@ its own and never depends on an overlay.
 | `pi-tool-display` | 0.5.0 | npm | `edit`/`write` diffs, thinking labels, native user box |
 | `pi-image-tools` | 1.4.0 | npm | Image attachments and previews |
 | `pi-transcript-window` | 0.3.1 | npm | Window over older transcript entries |
-| `pi-boxed-tools` | `9ad64f8d` | [GitHub](https://github.com/BubbatheVTOG/pi-boxed-tools) | Boxed rendering for `read`/`grep`/`find`/`ls`/`bash` |
+| `pi-boxed-tools` | `5e3aea2b` | [GitHub](https://github.com/BubbatheVTOG/pi-boxed-tools) | Boxed rendering for `read`/`grep`/`find`/`ls`/`bash` |
 | `agent-voice` | `8b32166f` | [GitHub](https://github.com/BubbatheVTOG/agent-voice) | Optional spoken announcements with a footer indicator; off by default |
 | `pi-local-cloud-toggle` | `a5381780` | [GitHub](https://github.com/BubbatheVTOG/pi-local-cloud-toggle) | Toggle between an existing local model and the previous cloud model |
 | `local-web-search` | local | `extensions/web-search/` | Web tools backed by a SearXNG you run yourself |

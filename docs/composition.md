@@ -123,7 +123,7 @@ Local tweaks are not automatically public, even when reconciliation preserves th
 
 | Component | Owner/source | Candidate boundary |
 | --- | --- | --- |
-| pi-boxed-tools | <https://github.com/BubbatheVTOG/pi-boxed-tools> | Commit `9ad64f8d773708aef9a823a2bc896c5537d8b0e0`, HTTPS archive in npm union lock; source not forked here |
+| pi-boxed-tools | <https://github.com/BubbatheVTOG/pi-boxed-tools> | Commit `5e3aea2bf8e9d641c42b9912c94e5f9cfefaf3c9`, HTTPS archive in npm union lock; source not forked here |
 | OpenCodeHyperTermTheme | <https://github.com/BubbatheVTOG/OpenCodeHyperTermTheme> | `config/themes/` fallback snapshots; no mutable external theme symlink |
 | agent-voice | <https://github.com/BubbatheVTOG/agent-voice> | Commit `8b32166f0d3f2f592779468f3d5b2762ec93c941`, archive SHA-256 in manifest; only the extension resource is deployed |
 | npm plugins | Exact identities/revisions in `manifest.json` | Complete public lock in `config/dependencies/`; no sequential Pi installs |
