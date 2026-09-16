@@ -48,7 +48,8 @@ its own and never depends on an overlay.
 | `local-web-search` | local | `extensions/web-search/` | Web tools backed by a SearXNG you run yourself |
 | `splash` | local | `extensions/splash/` | Startup splash |
 | `hyper-term-*` | snapshot | `config/themes/` | Seven theme snapshots; white is the default |
-| `plan`, `pi-improver` | local | `config/skills/` | Outcome-first planning; evidence-based Pi improvement |
+| `plan` | local | `config/skills/` | Outcome-first planning |
+| `pi-improver` | local | `config/skills/` | Evidence-based Pi improvement |
 | `first-principles-researcher` | local | `config/skills/` | Deep research grounded in first principles, verified sources, and explicit uncertainty |
 
 Projects of mine that this configuration builds on:
