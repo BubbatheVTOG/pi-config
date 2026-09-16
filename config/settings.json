@@ -58,11 +58,21 @@
         "thinking": "high"
       },
       "researcher": {
-        "model": "vllm/bubba",
+        "model": "inherit",
         "tools": "inherit"
       },
       "scout": {
-        "model": "vllm/bubba"
+        "model": "inherit"
+      }
+    },
+    "agentOverridesByProvider": {
+      "vllm": {
+        "researcher": {
+          "model": "lfm-vllm/bubba"
+        },
+        "scout": {
+          "model": "lfm-vllm/bubba"
+        }
       }
     }
   },

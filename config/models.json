@@ -33,6 +33,20 @@
           }
         }
       ]
+    },
+    "lfm-vllm": {
+      "api": "openai-completions",
+      "baseUrl": "http://192.168.1.5:8000/v1",
+      "models": [
+        {
+          "id": "bubba",
+          "name": "LFM 2.5 8B",
+          "input": [
+            "text"
+          ],
+          "reasoning": false
+        }
+      ]
     }
   }
 }
