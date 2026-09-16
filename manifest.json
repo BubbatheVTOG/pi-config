@@ -7,6 +7,7 @@
     "npm-btw": {"description": "Public side-question command"},
     "personal-provider": {"description": "Optional personal provider and model routing"},
     "voice": {"description": "Optional local voice, default off, external backend"},
+    "model-toggle": {"description": "Toggle between local vLLM and the previous cloud model"},
     "searxng": {"description": "Optional local SearXNG and HTTP content tools"},
     "subagents": {"description": "Shared pi-subagents, upstream tree, FleetView and async widget defaults"},
     "questions": {"description": "Structured question UI"},
@@ -42,6 +43,7 @@
       "splash": {"feature": "splash", "owner": "pi-config", "value": {"type": "extensions", "source": "extensions/splash"}, "claims": ["renderer:header"]},
       "themes": {"feature": "themes", "owner": "OpenCodeHyperTermTheme", "value": {"type": "themes", "source": "config/themes"}},
       "agent-voice": {"feature": "voice", "owner": "agent-voice", "value": {"type": "extensions", "archive": {"url": "https://codeload.github.com/BubbatheVTOG/agent-voice/tar.gz/14944569949076037f1a9397e12c00fb5d2109e5", "sha256": "33dc94ca34ec72c348f26a2f89624f811be2a18f3e22d4502c4995e16cc56e3b", "path": "extension"}}, "claims": ["tool:speak", "command:voice", "status:agent-voice"]},
+      "pi-local-cloud-toggle": {"feature": "model-toggle", "owner": "pi-local-cloud-toggle", "value": {"type": "extensions", "archive": {"url": "https://codeload.github.com/BubbatheVTOG/pi-local-cloud-toggle/tar.gz/d9ea5d0dc8d50ccee1bc374925d828e2b365b258", "sha256": "53b13b27236a125bb58c3be232e48632bab71a43479854bf19f98a2264022b8c", "path": "extension"}}, "claims": ["command:local", "status:pi-local-cloud"]},
       "pi-vcc-config.json": {"feature": "vcc", "owner": "pi-config", "shared": true, "value": {"type": "copy", "source": "config/pi-vcc-config.json"}},
       "tasks-config.json": {"feature": "tasks", "owner": "pi-config", "shared": true, "value": {"type": "copy", "source": "config/tasks-config.json"}},
       "extensions/pi-tool-display/config.json": {"feature": "tool-display", "owner": "pi-config", "shared": true, "requires": ["boxed-tools"], "value": {"type": "copy", "source": "extensions/pi-tool-display/config.json"}},
@@ -62,6 +64,7 @@
       "/collapseChangelog": {"feature": "core", "owner": "pi-config", "shared": true, "source": "config/settings.json", "pointer": "/collapseChangelog"},
       "/powerline/welcome": {"feature": "footer", "owner": "pi-config", "shared": true, "source": "config/settings.json", "pointer": "/powerline/welcome"},
       "/powerline/customItems": {"feature": "voice", "owner": "pi-config", "source": "config/settings.json", "pointer": "/powerline/customItems", "requires": ["footer"]},
+      "/modelToggle": {"feature": "model-toggle", "owner": "pi-config", "source": "config/settings.json", "pointer": "/modelToggle"},
       "/terminal": {"feature": "core", "owner": "pi-config", "shared": true, "source": "config/settings.json", "pointer": "/terminal"},
       "/steeringMode": {"feature": "core", "owner": "pi-config", "shared": true, "source": "config/settings.json", "pointer": "/steeringMode"}
     },

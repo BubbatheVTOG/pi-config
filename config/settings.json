@@ -2,6 +2,16 @@
   "defaultProvider": "vllm",
   "defaultModel": "bubba",
   "theme": "hyper-term-white",
+  "modelToggle": {
+    "enabled": true,
+    "persistence": "user",
+    "local": {
+      "baseUrl": "https://ai.xorro.tech/v1",
+      "modelEnv": "LOCAL_MODEL_ID",
+      "provider": "local-vllm"
+    },
+    "widget": false
+  },
   "subagents": {
     "agentOverrides": {
       "scout": {
@@ -37,6 +47,14 @@
       {
         "id": "agent-voice",
         "statusKey": "agent-voice",
+        "position": "right",
+        "hideWhenMissing": true,
+        "selfColorize": true,
+        "excludeFromExtensionStatuses": true
+      },
+      {
+        "id": "pi-local-cloud",
+        "statusKey": "pi-local-cloud",
         "position": "right",
         "hideWhenMissing": true,
         "selfColorize": true,
