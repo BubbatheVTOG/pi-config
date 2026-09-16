@@ -4,6 +4,7 @@
     "core": {"description": "Portable workflow and settings"},
     "personal-plan": {"description": "Primary risk-first planning skill"},
     "self-improvement": {"description": "Evidence-first Pi improvement with separate activation approval"},
+    "first-principles-research": {"description": "Evidence-based research grounded in first principles"},
     "npm-btw": {"description": "Public side-question command"},
     "personal-provider": {"description": "Optional personal provider and model routing"},
     "voice": {"description": "Optional local voice, default off, external backend"},
@@ -39,6 +40,7 @@
     "resources": {
       "plan": {"feature": "personal-plan", "owner": "pi-config", "value": {"type": "skills", "source": "config/skills/plan"}, "claims": ["skill:plan"]},
       "pi-improver": {"feature": "self-improvement", "owner": "pi-config", "value": {"type": "skills", "source": "config/skills/pi-improver"}, "claims": ["skill:pi-improver"]},
+      "first-principles-researcher": {"feature": "first-principles-research", "owner": "pi-config", "value": {"type": "skills", "source": "config/skills/first-principles-researcher"}, "claims": ["skill:first-principles-researcher"]},
       "web-search": {"feature": "searxng", "owner": "pi-config", "value": {"type": "extensions", "source": "extensions/web-search"}, "claims": ["tool:web_search", "tool:fetch_content", "tool:get_search_content", "renderer:web_search", "renderer:fetch_content", "renderer:get_search_content"]},
       "splash": {"feature": "splash", "owner": "pi-config", "value": {"type": "extensions", "source": "extensions/splash"}, "claims": ["renderer:header"]},
       "themes": {"feature": "themes", "owner": "OpenCodeHyperTermTheme", "value": {"type": "themes", "source": "config/themes"}},

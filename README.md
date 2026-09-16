@@ -49,6 +49,7 @@ its own and never depends on an overlay.
 | `splash` | local | `extensions/splash/` | Startup splash |
 | `hyper-term-*` | snapshot | `config/themes/` | Seven theme snapshots; white is the default |
 | `plan`, `pi-improver` | local | `config/skills/` | Outcome-first planning; evidence-based Pi improvement |
+| `first-principles-researcher` | local | `config/skills/` | Deep research grounded in first principles, verified sources, and explicit uncertainty |
 
 Projects of mine that this configuration builds on:
 
@@ -65,6 +66,8 @@ Projects of mine that this configuration builds on:
 - **[pi-local-cloud-toggle](https://github.com/BubbatheVTOG/pi-local-cloud-toggle)**
   switches between the configured existing local model and the previously selected
   cloud model. Its footer item is hidden when the local model is unavailable.
+- **first-principles-researcher** is a local skill for breaking complex questions
+  down into fundamentals, verifying primary sources, and clearly stating uncertainty.
 
 ## Platforms and prerequisites
 
