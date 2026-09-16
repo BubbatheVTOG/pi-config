@@ -70,8 +70,15 @@ pi install <your Duo provider package source>
 
 The Duo provider, its model catalog, and the private skills live in their own
 repositories; credentials stay in the environment or `~/.pi/agent/auth.json`.
-If a machine still has the legacy `~/.pi/agent/extensions/agent-voice` symlink
-from the old `install.sh`, remove the symlink (keep the repo) or voice loads twice.
+If a machine still has a leftover `~/.pi/agent/extensions/agent-voice`
+(either a stale symlink, or a frozen file copy from before the extension moved
+into its own repo — the copy is a plain `cp` with no `.git` and read-only
+perms), remove that directory and keep the git package. With two copies pi
+aborts extension loading instead of just degrading: both register the `speak`
+tool and `pi` fails to start with a `speak` conflict. `install.sh` only creates
+a symlink and refuses to run when a real directory is already present, so a
+frozen copy did not come from it — find and remove whatever step materialized
+it, then delete the leftover and start pi fresh.
 
 ## Backups
 
