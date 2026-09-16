@@ -2,6 +2,10 @@
   "defaultProvider": "vllm",
   "defaultModel": "bubba",
   "theme": "hyper-term-white",
+  "modelToggle": {
+    "enabled": true,
+    "localModel": "vllm/bubba"
+  },
   "subagents": {
     "agentOverrides": {
       "scout": {
@@ -37,6 +41,14 @@
       {
         "id": "agent-voice",
         "statusKey": "agent-voice",
+        "position": "right",
+        "hideWhenMissing": true,
+        "selfColorize": true,
+        "excludeFromExtensionStatuses": true
+      },
+      {
+        "id": "pi-local-cloud",
+        "statusKey": "pi-local-cloud",
         "position": "right",
         "hideWhenMissing": true,
         "selfColorize": true,

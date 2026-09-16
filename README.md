@@ -44,6 +44,7 @@ its own and never depends on an overlay.
 | `pi-transcript-window` | 0.3.1 | npm | Window over older transcript entries |
 | `pi-boxed-tools` | `9ad64f8d` | [GitHub](https://github.com/BubbatheVTOG/pi-boxed-tools) | Boxed rendering for `read`/`grep`/`find`/`ls`/`bash` |
 | `agent-voice` | `8b32166f` | [GitHub](https://github.com/BubbatheVTOG/agent-voice) | Optional spoken announcements with a footer indicator; off by default |
+| `pi-local-cloud-toggle` | `a5381780` | [GitHub](https://github.com/BubbatheVTOG/pi-local-cloud-toggle) | Toggle between an existing local model and the previous cloud model |
 | `local-web-search` | local | `extensions/web-search/` | Web tools backed by a SearXNG you run yourself |
 | `splash` | local | `extensions/splash/` | Startup splash |
 | `hyper-term-*` | snapshot | `config/themes/` | Seven theme snapshots; white is the default |
@@ -61,6 +62,9 @@ Projects of mine that this configuration builds on:
 - **[agent-voice](https://github.com/BubbatheVTOG/agent-voice)** speaks agent
   status through a locally installed TTS backend and publishes the `VOICE ON/OFF`
   footer item. It stays off until you turn it on.
+- **[pi-local-cloud-toggle](https://github.com/BubbatheVTOG/pi-local-cloud-toggle)**
+  switches between the configured existing local model and the previously selected
+  cloud model. Its footer item is hidden when the local model is unavailable.
 
 ## Platforms and prerequisites
 
