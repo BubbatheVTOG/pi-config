@@ -23,7 +23,7 @@ MISSING = object()
 # Pi and its plugins create these after activation. They are never read, captured,
 # adopted or removed; a name outside this reviewed allowlist still refuses.
 RUNTIME_NAMES = {'auth.json', 'trust.json', 'sessions', 'cache', 'logs', 'models-cache',
-                 'models-store.json', 'subagent-artifacts', 'subagent-runs', 'tasks',
+                 'models-store.json', 'subagent-artifacts', 'subagent-runs', 'tasks', 'git',
                  'pi-improver', 'missions', 'plans', 'powerline-footer', 'web-search-cache',
                  'history.json', 'run-history.jsonl', 'package-state.json'}
 
