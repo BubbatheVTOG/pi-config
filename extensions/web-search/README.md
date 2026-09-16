@@ -20,12 +20,9 @@ ANSI/Unicode-aware wrapping, partial/error/empty states, six-line fetch preview 
 expanded full output. They do not rely on mutating copies returned by getAllTools.
 
 ```bash
-PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent \
-  node extensions/web-search/tests/renderers.test.mjs
-PI_CODING_AGENT_ROOT=/path/to/pi-coding-agent node --test tests/ui.test.mjs
+node extensions/web-search/tests/renderers.test.mjs
 ```
 
 Tests use deterministic mocks and do not contact a model or search endpoint. For
-changes, edit this source, verify, freeze a new generation and review its deployment
-diff. Deployment and reload each require separate approval. Rollback also uses the
-three-way deployment command; never remove live directories with a blanket delete.
+changes, edit this source and run the renderer test. Back up `~/.pi/agent/` before
+promoting runtime changes, then use Pi's native resource discovery and `/reload`.

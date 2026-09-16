@@ -1,5 +1,0 @@
-{
-  "baseUrl": "https://ai.xorro.tech/v1",
-  "api": "openai-completions",
-  "apiKey": "$VLLM_API_KEY"
-}

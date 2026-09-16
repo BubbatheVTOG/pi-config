@@ -1,63 +1,74 @@
 {
-  "defaultProvider": "vllm",
+  "collapseChangelog": true,
   "defaultModel": "bubba",
-  "theme": "hyper-term-white",
-  "modelToggle": {
-    "enabled": true,
-    "localModel": "vllm/bubba"
-  },
-  "subagents": {
-    "agentOverrides": {
-      "scout": {
-        "model": "vllm/bubba"
+  "defaultProvider": "vllm",
+  "hideThinkingBlock": false,
+  "packages": [
+    "npm:pi-subagents@0.68.0",
+    "npm:@nguyenquangthai/pi-ask@0.2.0",
+    "npm:@tintinweb/pi-tasks@0.9.0",
+    "npm:pi-powerline-footer@0.17.1",
+    "npm:@narumitw/pi-btw@0.58.1",
+    "npm:pi-lens@4.1.6",
+    "npm:@sting8k/pi-vcc@0.7.2",
+    "npm:pi-tool-display@0.5.0",
+    "git:github.com/BubbatheVTOG/pi-boxed-tools@5e3aea2bf8e9d641c42b9912c94e5f9cfefaf3c9",
+    "npm:pi-image-tools@1.4.0",
+    "npm:pi-transcript-window@0.3.1",
+    "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@a5381780f204f1975bd64a64678619464b1c34a1"
+  ],
+  "powerline": {
+    "customItems": [
+      {
+        "excludeFromExtensionStatuses": true,
+        "hideWhenMissing": true,
+        "id": "agent-voice",
+        "position": "right",
+        "selfColorize": true,
+        "statusKey": "agent-voice"
       },
-      "researcher": {
-        "model": "vllm/bubba",
-        "tools": "inherit"
-      },
-      "oracle": {
-        "thinking": "high"
-      },
-      "delegate": {
-        "acceptanceRole": "read-only"
+      {
+        "excludeFromExtensionStatuses": true,
+        "hideWhenMissing": true,
+        "id": "pi-local-cloud",
+        "position": "right",
+        "selfColorize": true,
+        "statusKey": "pi-local-cloud"
       }
-    }
+    ],
+    "welcome": false
   },
+  "quietStartup": true,
   "retry": {
+    "baseDelayMs": 2000,
     "enabled": true,
     "maxRetries": 3,
-    "baseDelayMs": 2000,
     "provider": {
       "maxRetries": 0,
       "maxRetryDelayMs": 60000
     }
   },
-  "hideThinkingBlock": false,
-  "quietStartup": true,
-  "collapseChangelog": true,
-  "powerline": {
-    "welcome": false,
-    "customItems": [
-      {
-        "id": "agent-voice",
-        "statusKey": "agent-voice",
-        "position": "right",
-        "hideWhenMissing": true,
-        "selfColorize": true,
-        "excludeFromExtensionStatuses": true
+  "steeringMode": "all",
+  "subagents": {
+    "agentOverrides": {
+      "delegate": {
+        "acceptanceRole": "read-only"
       },
-      {
-        "id": "pi-local-cloud",
-        "statusKey": "pi-local-cloud",
-        "position": "right",
-        "hideWhenMissing": true,
-        "selfColorize": true,
-        "excludeFromExtensionStatuses": true
+      "oracle": {
+        "thinking": "high"
+      },
+      "researcher": {
+        "model": "vllm/bubba",
+        "tools": "inherit"
+      },
+      "scout": {
+        "model": "vllm/bubba"
       }
-    ]
+    }
   },
   "terminal": {
     "showTerminalProgress": true
   },
-  "steeringMode": "all"
+  "theme": "hyper-term-white",
+  "lastChangelogVersion": "0.85.1"
 }
