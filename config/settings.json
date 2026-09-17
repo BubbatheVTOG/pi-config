@@ -12,7 +12,7 @@
     "npm:pi-lens@4.1.6",
     "npm:@sting8k/pi-vcc@0.7.2",
     "npm:pi-tool-display@0.5.0",
-    "git:github.com/BubbatheVTOG/pi-boxed-tools@2262c69a2a21b1c8baf738b0efd85a52955aa156",
+    "git:github.com/BubbatheVTOG/pi-boxed-tools@be593d41339ed47246ca2efe291200c815d020b7",
     "npm:pi-image-tools@1.4.0",
     "npm:pi-transcript-window@0.3.1",
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@dbec6f20c193f063328f6747938a355c8b81d145",
