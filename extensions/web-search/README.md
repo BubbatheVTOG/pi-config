@@ -1,9 +1,37 @@
 # Local web tools
 
-Feature `searxng` owns `web_search`, `fetch_content` and `get_search_content` (the
-last is a compatibility alias), their renderers and instruction section. Excluding
-that feature removes them together. This is additive public extension source;
-Pi core and other plugins are not modified.
+This extension owns `web_search`, `fetch_content` and `get_search_content` (the
+last is a compatibility alias) and their renderers. Disabling the whole extension
+removes all three tools. Pi core and other plugins are not modified.
+
+## Search availability
+
+The extension reads `webSearch.enabled` from global `settings.json` in Pi's agent
+directory (`~/.pi/agent/`, or `PI_CODING_AGENT_DIR`) each time its factory loads:
+
+```json
+{
+  "webSearch": {
+    "enabled": false
+  }
+}
+```
+
+- `false`: do not register `web_search`; the model cannot call it.
+- `true`, an omitted setting, or a missing settings file: preserve search registration.
+- Both URL-fetch tools remain registered and work without SearXNG.
+- Project settings cannot override this machine-wide choice. Registration does not
+  probe, install or start a search service.
+- Invalid JSON, unreadable settings, or an invalid `webSearch` value fail extension
+  loading with a sanitized error, rather than silently enabling search.
+
+The maintained work overlay sets this to `false`. It must be merged into global
+settings during separately approved deployment; Pi does not read `settings.work.json`
+directly. Deploy the matching extension source too, then separately approve a reload
+or restart. To restore search, set `true` or remove the key and reload after approval.
+The flag controls registration, not proof that the backend is reachable.
+
+## Backend and fetch configuration
 
 - `SEARXNG_URL`: default `http://127.0.0.1:8080`. The search service forwards queries
   to configured engines; it is not an offline service or an assurance that queries
@@ -20,9 +48,14 @@ ANSI/Unicode-aware wrapping, partial/error/empty states, six-line fetch preview 
 expanded full output. They do not rely on mutating copies returned by getAllTools.
 
 ```bash
+export PI_CODING_AGENT_ROOT=/path/to/installed/@earendil-works/pi-coding-agent
+node --test extensions/web-search/tests/registration.test.mjs
 node extensions/web-search/tests/renderers.test.mjs
 ```
 
-Tests use deterministic mocks and do not contact a model or search endpoint. For
-changes, edit this source and run the renderer test. Back up `~/.pi/agent/` before
-promoting runtime changes, then use Pi's native resource discovery and `/reload`.
+Tests use isolated temporary settings and deterministic mocks; they do not read
+live settings or contact a model or search endpoint. Registration tests cover
+search gating, global-only scope, invalid configuration, work-overlay behavior,
+and both fetch tools with search disabled. For changes, edit this source and run
+both tests. Back up `~/.pi/agent/` before promoting runtime changes, then use Pi's
+native resource discovery and `/reload`.

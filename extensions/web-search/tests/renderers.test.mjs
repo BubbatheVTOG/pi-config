@@ -4,6 +4,8 @@
 // Results are boxed (see "boxed result frame" in src/index.ts) — assertions
 // check the frame and the content lines inside it.
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -25,7 +27,7 @@ const alias = {
   typebox: path.join(PKG, "node_modules/typebox/build/index.mjs"),
 };
 
-const jiti = createJiti(import.meta.url, { moduleCache: false, alias });
+const jiti = createJiti(import.meta.url, { moduleCache: false, fsCache: false, alias });
 const factory = await jiti.import(path.join(ROOT, "src/index.ts"), {
   default: true,
 });
@@ -40,7 +42,16 @@ console.log("LOAD OK — extension factory is a function");
 
 const tools = [];
 const fakePi = { registerTool: (t) => tools.push(t) };
-factory(fakePi);
+const agentDir = mkdtempSync(path.join(tmpdir(), "pi-web-renderers-test-"));
+const previousAgentDir = process.env.PI_CODING_AGENT_DIR;
+try {
+  process.env.PI_CODING_AGENT_DIR = agentDir;
+  factory(fakePi);
+} finally {
+  if (previousAgentDir === undefined) delete process.env.PI_CODING_AGENT_DIR;
+  else process.env.PI_CODING_AGENT_DIR = previousAgentDir;
+  rmSync(agentDir, { recursive: true, force: true });
+}
 for (const name of ["web_search", "fetch_content", "get_search_content"]) {
   const t = tools.find((x) => x.name === name);
   if (

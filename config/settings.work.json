@@ -1,6 +1,9 @@
 {
   "defaultProvider": "gitlab-duo",
   "defaultModel": "gpt-6-astra",
+  "webSearch": {
+    "enabled": false
+  },
   "skills": [
     "~/git/agent-skills/address-mr-comments",
     "~/git/agent-skills/angular-refactoring",
@@ -12,7 +15,7 @@
     "~/git/agent-skills/dynatrace-api",
     "~/git/agent-skills/grilling",
     "~/git/agent-skills/jira-board-cli",
-    "~/git/agent-skills/mermaid-diagram-generator",
+    "~/git/agent-skills/mermaid-web-diagram-generator",
     "~/git/agent-skills/mma-support-assistant",
     "~/git/agent-skills/openapi-annotation-audit",
     "~/git/agent-skills/postman-collection-cleanup",

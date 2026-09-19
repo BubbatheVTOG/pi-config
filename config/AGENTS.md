@@ -56,11 +56,15 @@ listed by `pi list`. Local extensions and skills are loaded from `~/.pi/agent/`.
   `@tintinweb/pi-subagents`, which is not installed (we use nicobailon's `pi-subagents`).
   For multi-step work (3+ distinct steps), proactively create tasks with `TaskCreate` and
   keep statuses updated as work progresses — do not wait to be asked.
-- **Research** — `web_search`, `fetch_content`, and `get_search_content` are provided by the
-  local web-search extension and routed through SearXNG at `127.0.0.1:8080`. Search is for
-  discovery; fetch the primary source before relying on a claim. Prefer the `researcher`
-  subagent for multi-angle research. Return a distilled brief with URL citations rather than
-  raw HTML. Use `pdftotext`, `yt-dlp`, or `gh` when a task needs those formats.
+- **Research** — when enabled, `web_search` uses SearXNG (`SEARXNG_URL`, default
+  `127.0.0.1:8080`). The work overlay disables search where no backend is available;
+  do not assume SearXNG is installed or try to start it. `fetch_content` and
+  `get_search_content` fetch URLs directly and do not require SearXNG. Use only
+  available tools; without search, use known primary-source URLs or report the
+  discovery limitation. Search is for discovery; fetch primary sources before
+  relying on claims. Prefer the `researcher` subagent for multi-angle research
+  when its required tools are available. Return a distilled brief with URL citations
+  rather than raw HTML. Use `pdftotext`, `yt-dlp`, or `gh` when a task needs those formats.
 - **Questions** — `ask_user_question` (pi-ask) for structured 1–4 question dialogs.
 - **Config** — `~/.pi/agent/settings.json` (global), `.pi/settings.json` (project).
   Themes are the `hyper-term-*` set in `~/.pi/agent/themes/`; they hot-reload.

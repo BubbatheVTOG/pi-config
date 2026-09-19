@@ -19,7 +19,8 @@
 // trained to call these exact tool names; this restores that surface without
 // re-adding pi-web-access.
 //
-// Config (env, all optional):
+// Config: global settings.json webSearch.enabled defaults to true; false skips
+// only web_search registration. Environment (optional):
 //   SEARXNG_URL     default http://127.0.0.1:8080
 //   WEB_FETCH_TIMEOUT_MS  default 20000
 //
@@ -27,8 +28,10 @@
 // localhost/private ranges (deliberate — this box serves local vLLM/n8n
 // metrics the user may want to read). It never follows non-http(s) schemes.
 
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { keyHint } from "@earendil-works/pi-coding-agent";
+import { getAgentDir, keyHint } from "@earendil-works/pi-coding-agent";
 import { Text, visibleWidth, truncateToWidth, wrapTextWithAnsi } from "@earendil-works/pi-tui";
 import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
@@ -55,6 +58,31 @@ function str(v: unknown, max: number): string {
 }
 
 // ── web_search ───────────────────────────────────────────────────────────────
+
+function isSearchEnabled(): boolean {
+  let settings: unknown;
+  try {
+    settings = JSON.parse(readFileSync(join(getAgentDir(), "settings.json"), "utf8"));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return true;
+    // JSON errors may include settings contents; report only the configuration issue.
+    throw new Error("web-search: cannot read or parse global settings.json");
+  }
+  if (!settings || typeof settings !== "object" || Array.isArray(settings)) {
+    throw new Error("web-search: global settings.json must contain an object");
+  }
+  const config = (settings as { webSearch?: unknown }).webSearch;
+  if (config === undefined) return true;
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    throw new Error("web-search: webSearch in global settings.json must be an object");
+  }
+  const enabled = (config as { enabled?: unknown }).enabled;
+  if (enabled === undefined) return true;
+  if (typeof enabled !== "boolean") {
+    throw new Error("web-search: webSearch.enabled in global settings.json must be a boolean");
+  }
+  return enabled;
+}
 
 async function runSearch(
   query: string,
@@ -554,7 +582,7 @@ const FETCH_PARAMS = Type.Object({
   ),
 });
 
-export default function (pi: ExtensionAPI): void {
+function registerSearchTool(pi: ExtensionAPI): void {
   pi.registerTool({
     name: "web_search",
     label: "Web Search",
@@ -576,6 +604,10 @@ export default function (pi: ExtensionAPI): void {
       return { content: [{ type: "text" as const, text }], details: {} };
     },
   });
+}
+
+export default function (pi: ExtensionAPI): void {
+  if (isSearchEnabled()) registerSearchTool(pi);
 
   pi.registerTool({
     name: "fetch_content",

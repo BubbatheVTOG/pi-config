@@ -58,9 +58,11 @@ outside this repository.
 
 ## Work machine
 
-`config/settings.work.json` holds the only work-specific differences: the startup
-provider/model and the private skill paths. It is a delta, not a full settings
-file. On a work machine, after installing the baseline:
+`config/settings.work.json` holds the work-specific differences: the startup
+provider/model, private skill paths, and `webSearch.enabled: false` on machines
+without SearXNG. This disables only search registration; URL fetching remains
+available. It is a delta, not a full settings file, and Pi does not load it
+separately. On a work machine, after installing the baseline:
 
 ```bash
 jq -s '.[0] * .[1]' ~/.pi/agent/settings.json config/settings.work.json > /tmp/s.json \

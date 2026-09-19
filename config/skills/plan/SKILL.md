@@ -18,12 +18,12 @@ no project file, home-directory report or numbered release ceremony is compulsor
 - **Read before planning.** Use `scout` for codebase recon you don't already
   have, and `researcher` for external facts. A plan built on guesses is a plan
   to redo the work.
-- **Planning is read-only. The user says when to go.** No source edits, no new
-  project files, no deletes, no installs, no migrations, no pushes, and no git
-  state changes (branch, commit, stash) — all of that waits for an explicit go.
-  The only write planning may make is the plan file itself, and only when the
-  user wants it on disk; otherwise present the plan in chat. When in doubt, the
-  answer is: don't write it, ask.
+- **Planning does not authorize implementation. The user says when to go.** No
+  source edits, new project files, deletes, installs, migrations, pushes or git
+  state changes (branch, commit, stash) without an explicit go. Exceptions are
+  task bookkeeping through the available task tools (step 7) and a plan file
+  only when the user requests it on disk. Task bookkeeping needs no separate
+  execution approval; it does not authorize implementation or agent launches.
 - **Stop and ask when a blocker is a decision, not a fact.** Missing information
   that only the user has is a question, not an assumption to paper over.
 - **Plans are cheap; execution is expensive.** Prefer one extra clarifying round
@@ -124,7 +124,7 @@ Mark the checkpoints where you will stop and report rather than continue.
 
 Before step one — *after* the go — inspect current refs and work, confirm the
 toolchain, capture the green baseline, agree a recoverable checkpoint and rollback,
-then create tasks where useful (step 7). Follow the repository's branch policy;
+then review and update the task list (step 7). Follow the repository's branch policy;
 a go is not permission to create a feature branch, stash, publish or reload.
 
 For genuinely uncertain plans, run `oracle` over the finished plan for a second
@@ -132,9 +132,11 @@ opinion before executing — it is cheaper than one wrong implementation.
 
 ### 7. Create the tasks
 
-For substantial multi-step work, use pi-tasks when available and approved. A
-short plan in the conversation is enough for small work. If persistence is needed,
-agree a concise checkpoint rather than imposing files or task tooling.
+For substantial multi-step work (3+ distinct steps), proactively use pi-tasks
+when available, including during planning. Check `TaskList` before creating tasks
+to avoid duplicates. A short plan in the conversation is enough for small work
+or when task tools are unavailable. A separate checkpoint file remains optional
+and requires agreement.
 
 - **One task per verifiable step.** `subject` imperative and short; `description`
   carries the acceptance criteria, the verification command, and the rollback.
@@ -154,9 +156,10 @@ agree a concise checkpoint rather than imposing files or task tooling.
   children so they happen concurrently.
 - **Name the critical path.** The longest dependency chain is where delay
   actually costs; everything else has slack. Say which chain it is.
-- **When to create them:** after the user says go — or immediately if the user
-  asks for them during planning. Skip task creation only for genuinely trivial
-  plans.
+- **When to create them:** as soon as substantial multi-step work is identified,
+  without waiting to be asked. Track planning progress immediately; keep
+  implementation tasks pending and explicitly blocked on approval until go.
+  Keep statuses current as scope and progress change.
 - **Drive them yourself.** Mark `in_progress` before starting a task and
   `completed` only when its verification passes. `TaskExecute` and auto-cascade
   are inert here (they expect `@tintinweb/pi-subagents`), so check `TaskList`,
@@ -185,7 +188,15 @@ Rules for the gate:
 - **On go:** preserve existing work, capture the baseline, use the agreed
   checkpoint/tasks, then work the steps in order and verify each.
 - **Resuming later:** re-read the agreed handoff and available task state, confirm
-  source/input drift and remaining approval scope before continuing.
+  source/input drift and remaining approval scope before continuing. For delegated
+  work, keep the owning project/worktree `cwd` alongside available mission IDs,
+  run IDs and returned artifact paths in existing task metadata or an agreed
+  handoff; no new checkpoint file is required. Use that owning `cwd` for mission
+  lookup, not the parent session's current directory. If references are missing,
+  use supported discovery/status tools rather than guessing IDs or paths. Missing
+  metadata is not proof that work stopped: verify current status and changed files
+  before resuming or relaunching, and stop for a decision if ownership or running
+  state remains unknown.
 - **Promotion and activation:** classify meaningful change batches with the user
   as Personal/shared, Enterprise-only, Split or Local before publication.
   Unclassified stays unpublished. Execution approval is not publication,
