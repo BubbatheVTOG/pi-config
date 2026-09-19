@@ -20,6 +20,14 @@
     "npm:pi-cache-optimizer@2.8.10",
     "npm:@narumitw/pi-cache-hit-monitor@0.1.0"
   ],
+  "piVim": {
+    "borderSync": {
+      "insert": "mode",
+      "normal": "mode",
+      "visual": "mode",
+      "ex": "mode"
+    }
+  },
   "powerline": {
     "customItems": [
       {
