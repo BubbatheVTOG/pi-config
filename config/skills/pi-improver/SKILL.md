@@ -54,6 +54,12 @@ helpful triage vocabulary, not authority to “fix now.” For delegation, disti
 provider latency, approval waits and repeated discovery from actual task/model/tool
 mismatch. More children or fewer checks are not automatically faster.
 
+Subtraction counts as improvement: with the same evidence bar, propose retiring
+settings, instruction lines, skills, plugins, aliases and files that no longer earn
+their keep — dead, redundant, unused, or shadowed by something better. Idle
+instructions and plugins still cost context, discovery, maintenance and runtime;
+removal needs the same approval gates as adding.
+
 ## Diagnose and choose the lightest layer
 
 Read current schemas, authoritative source, applicable repo instructions and
