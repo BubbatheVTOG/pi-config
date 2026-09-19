@@ -11,11 +11,12 @@ is not a deployment framework and does not generate configuration snapshots.
 - `config/models.json` — model/provider configuration using environment-backed
   credentials where needed
 - `config/skills/` — local skills
-- `extensions/` — local extensions and plugin configuration
+- `extensions/` — local extensions and plugin configuration, at the same
+  relative path the plugin reads under `~/.pi/agent/` (for example
+  `extensions/pi-transcript-window/config.json`)
 - `config/themes/` — local theme files
 - `config/pi-vcc-config.json` — VCC configuration
 - `config/tasks-config.json` — task configuration
-- `config/transcript-window.json` — transcript-window configuration
 
 ## Native package management
 
@@ -72,6 +73,12 @@ pi install <your Duo provider package source>
 
 The Duo provider, its model catalog, and the private skills live in their own
 repositories; credentials stay in the environment or `~/.pi/agent/auth.json`.
+This repository is public, so the Duo provider's internal source URL and commit
+pin are deliberately not tracked in either settings file. A work machine will
+always show that package in `pi list` and in its live `~/.pi/agent/settings.json`
+without a matching entry here: that is expected, not drift. Pinning it would
+also need a merge change, because `jq -s '.[0] * .[1]'` replaces arrays and a
+`packages` key in the work delta would drop the baseline packages.
 If a machine still has a leftover `~/.pi/agent/extensions/agent-voice`
 (either a stale symlink, or a frozen file copy from before the extension moved
 into its own repo — the copy is a plain `cp` with no `.git` and read-only
