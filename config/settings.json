@@ -19,7 +19,7 @@
     "git:github.com/BubbatheVTOG/agent-voice@d832560b90a022a534648014e6acedaf113ef4fe",
     "npm:pi-cache-optimizer@2.8.10",
     "npm:@narumitw/pi-cache-hit-monitor@0.1.0",
-    "git:github.com/BubbatheVTOG/pi-foot@2504476c3e12322c62d2828ac54b1b6cff636f61"
+    "git:github.com/BubbatheVTOG/pi-foot@05fd83ec1571424b2ad5e18127d64648ebd2c951"
   ],
   "piFoot": {
     "order": [
