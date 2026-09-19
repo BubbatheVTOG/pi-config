@@ -54,6 +54,17 @@ helpful triage vocabulary, not authority to “fix now.” For delegation, disti
 provider latency, approval waits and repeated discovery from actual task/model/tool
 mismatch. More children or fewer checks are not automatically faster.
 
+For cache-related changes, schedule a later evidence pass rather than assuming
+benefit from installation. The current cache setup is `pi-cache-optimizer` plus the
+read-only `@narumitw/pi-cache-hit-monitor`, alongside `pi-vcc` and
+`pi-powerline-footer`. In the next Pi-improver review, inspect the monitor after
+comparable provider/model workloads and compare optimizer-enabled versus disabled
+runs. Record provider/model, request count, cache-read tokens, total prompt tokens,
+hit rate, uncached share, estimated re-billing and any prompt/tool behavior changes.
+Treat provider-reported usage as the evidence; do not infer improvement from the
+optimizer's presence or from a single turn. Keep the optimizer only if the effect is
+repeatable and worth the prompt-mutation and maintenance costs.
+
 Subtraction counts as improvement: with the same evidence bar, propose retiring
 settings, instruction lines, skills, plugins, aliases and files that no longer earn
 their keep — dead, redundant, unused, or shadowed by something better. Idle
