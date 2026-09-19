@@ -19,8 +19,34 @@
     "git:github.com/BubbatheVTOG/agent-voice@d832560b90a022a534648014e6acedaf113ef4fe",
     "npm:pi-cache-optimizer@2.8.10",
     "npm:@narumitw/pi-cache-hit-monitor@0.1.0",
-    "git:github.com/BubbatheVTOG/pi-foot@762d3e7e6e36fb08a6f9a0a1ce5bcb36c5034a0a"
+    "git:github.com/BubbatheVTOG/pi-foot@582b2af4e044bdb14ab157c8fb3849534760065a"
   ],
+  "piFoot": {
+    "order": [
+      "model",
+      "reasoning",
+      "cost",
+      "tokens",
+      "cloud",
+      "voice",
+      "cache",
+      "registry",
+      "lsp"
+    ],
+    "separator": " │ ",
+    "colors": {
+      "model": "muted",
+      "reasoning": "muted",
+      "cost": "muted",
+      "tokens": "muted",
+      "cloud": "muted",
+      "voice": "muted",
+      "cache": "muted",
+      "registry": "muted",
+      "lsp": "muted",
+      "separator": "accent"
+    }
+  },
   "piVim": {
     "borderSync": {
       "insert": "mode",
