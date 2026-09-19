@@ -17,6 +17,7 @@ is not a deployment framework and does not generate configuration snapshots.
 - `config/themes/` — local theme files
 - `config/pi-vcc-config.json` — VCC configuration
 - `config/tasks-config.json` — task configuration
+- `config/rpiv-ask-user-question/config.json` — inline questionnaire layout and keyboard settings
 
 ## Native package management
 
