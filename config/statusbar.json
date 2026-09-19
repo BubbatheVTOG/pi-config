@@ -1,0 +1,11 @@
+{
+  "divider": " | ",
+  "sections": [
+    "model",
+    "thinking",
+    "context",
+    "cost",
+    "cache"
+  ],
+  "footerSpacing": 0
+}
