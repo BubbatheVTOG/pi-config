@@ -19,7 +19,7 @@
     "git:github.com/BubbatheVTOG/agent-voice@d832560b90a022a534648014e6acedaf113ef4fe",
     "npm:pi-cache-optimizer@2.8.10",
     "npm:@narumitw/pi-cache-hit-monitor@0.1.0",
-    "git:github.com/BubbatheVTOG/pi-foot@582b2af4e044bdb14ab157c8fb3849534760065a"
+    "git:github.com/BubbatheVTOG/pi-foot@8c1e65cee5d7cc5b77f66986404544b1842afca4"
   ],
   "piFoot": {
     "order": [
@@ -30,7 +30,6 @@
       "cloud",
       "voice",
       "cache",
-      "registry",
       "lsp"
     ],
     "separator": " │ ",
@@ -42,7 +41,6 @@
       "cloud": "muted",
       "voice": "muted",
       "cache": "muted",
-      "registry": "muted",
       "lsp": "muted",
       "separator": "accent"
     }
