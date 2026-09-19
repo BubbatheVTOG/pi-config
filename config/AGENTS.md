@@ -54,6 +54,8 @@ listed by `pi list`. Local extensions and skills are loaded from `~/.pi/agent/`.
   `TaskStop`/`TaskExecute` plus `/tasks` and a live widget. Mark `in_progress` before
   starting, `completed` when done. `TaskExecute` and auto-cascade are inert: they expect
   `@tintinweb/pi-subagents`, which is not installed (we use nicobailon's `pi-subagents`).
+  For multi-step work (3+ distinct steps), proactively create tasks with `TaskCreate` and
+  keep statuses updated as work progresses — do not wait to be asked.
 - **Research** — `web_search`, `fetch_content`, and `get_search_content` are provided by the
   local web-search extension and routed through SearXNG at `127.0.0.1:8080`. Search is for
   discovery; fetch the primary source before relying on a claim. Prefer the `researcher`
