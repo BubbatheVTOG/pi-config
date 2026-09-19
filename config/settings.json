@@ -49,6 +49,7 @@
     "welcome": false
   },
   "quietStartup": true,
+  "showLastPrompt": false,
   "retry": {
     "baseDelayMs": 2000,
     "enabled": true,
