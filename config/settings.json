@@ -18,7 +18,8 @@
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@dbec6f20c193f063328f6747938a355c8b81d145",
     "git:github.com/BubbatheVTOG/agent-voice@d832560b90a022a534648014e6acedaf113ef4fe",
     "npm:pi-cache-optimizer@2.8.10",
-    "npm:@narumitw/pi-cache-hit-monitor@0.1.0"
+    "npm:@narumitw/pi-cache-hit-monitor@0.1.0",
+    "git:github.com/BubbatheVTOG/pi-foot@608b9a8272b963545e268b21c672e66f5099fe3"
   ],
   "piVim": {
     "borderSync": {
