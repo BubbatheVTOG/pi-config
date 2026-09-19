@@ -37,6 +37,13 @@
         "position": "right",
         "selfColorize": true,
         "statusKey": "pi-local-cloud"
+      },
+      {
+        "excludeFromExtensionStatuses": true,
+        "hideWhenMissing": true,
+        "id": "cache-stats",
+        "position": "right",
+        "statusKey": "pi-cache-stats"
       }
     ],
     "welcome": false
