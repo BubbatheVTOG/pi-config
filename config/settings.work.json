@@ -4,6 +4,12 @@
   "webSearch": {
     "enabled": false
   },
+  "jev": {
+    "disable": true
+  },
+  "toolGuard": {
+    "disable": true
+  },
   "skills": [
     "~/git/agent-skills/address-mr-comments",
     "~/git/agent-skills/angular-refactoring",
