@@ -22,7 +22,7 @@
     "git:github.com/BubbatheVTOG/pi-foot@a2ca5742911f47663854700a0110d7d9a609ab9b",
     "git:github.com/BubbatheVTOG/pi-jev-anti-slop@94f781062dcf70423057b663d80ea0aa349131e1",
     "git:github.com/BubbatheVTOG/pi-jev-tool-guard@6577b329f88169e3e6ceb77574bec126abf94a0d",
-    "git:github.com/BubbatheVTOG/pi-redact@8ecd27f9cf1cc1e475846a60973afe17bc9883d1"
+    "git:github.com/BubbatheVTOG/pi-jev-redact@c3e82fa6c89f2a9823d463503b259c978fc974d9"
   ],
   "piFoot": {
     "order": [
