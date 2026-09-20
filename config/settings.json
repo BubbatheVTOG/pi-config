@@ -19,12 +19,13 @@
     "git:github.com/BubbatheVTOG/agent-voice@d832560b90a022a534648014e6acedaf113ef4fe",
     "npm:pi-cache-optimizer@2.8.10",
     "npm:@narumitw/pi-cache-hit-monitor@0.1.0",
-    "git:github.com/BubbatheVTOG/pi-foot@05fd83ec1571424b2ad5e18127d64648ebd2c951"
+    "git:github.com/BubbatheVTOG/pi-foot@37a3d35caae88625f55f5a55f8635e467d5716c3"
   ],
   "piFoot": {
     "order": [
       "model",
       "reasoning",
+      "context",
       "cost",
       "tokens",
       "cloud",
@@ -36,6 +37,7 @@
     "colors": {
       "model": "muted",
       "reasoning": "muted",
+      "context": "muted",
       "cost": "muted",
       "tokens": "muted",
       "cloud": "muted",
