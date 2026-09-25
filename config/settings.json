@@ -23,7 +23,7 @@
     "git:github.com/BubbatheVTOG/pi-jev-anti-slop@94f781062dcf70423057b663d80ea0aa349131e1",
     "git:github.com/BubbatheVTOG/pi-jev-tool-guard@6577b329f88169e3e6ceb77574bec126abf94a0d",
     "git:github.com/BubbatheVTOG/pi-jev-redact@c3e82fa6c89f2a9823d463503b259c978fc974d9",
-    "git:gitlab.com/bubbathevtog/pi-gitlab-duo-provider@f0233c0d42a7df7b77d4880e067cbd77186be4e8"
+    "git:gitlab.com/bubbathevtog/pi-gitlab-duo-provider@021fb95e777a98795cda2c24369ddcb17e6aee47"
   ],
   "piFoot": {
     "order": [
