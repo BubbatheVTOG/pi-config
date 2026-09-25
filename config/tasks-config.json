@@ -1,3 +1,4 @@
 {
-  "taskScope": "session-global"
+  "taskScope": "session-global",
+  "autoClearCompleted": "on_task_complete"
 }
