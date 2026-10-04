@@ -41,9 +41,10 @@ Caveats:
 
 ## pi workflow
 
-Installed packages include `pi-subagents`, `@tintinweb/pi-tasks`, `@nguyenquangthai/pi-ask`,
-`pi-powerline-footer`, `pi-lens`, `@narumitw/pi-btw`, `pi-tool-display`, and other packages
-listed by `pi list`. Local extensions and skills are loaded from `~/.pi/agent/`.
+Installed packages include `pi-subagents`, `@tintinweb/pi-tasks`,
+`@weihannpmgo/pi-ask-user-question`, `pi-foot` (the footer), `pi-lens`,
+`@narumitw/pi-btw`, `pi-tool-display`, `pi-vcc`, and other packages listed by
+`pi list`. Local extensions and skills are loaded from `~/.pi/agent/`.
 
 - **Delegation** — `subagent` spawns focused children. Built-ins: `scout` (codebase recon
   before you understand the code), `researcher` (web research, writes `research.md`),
@@ -131,6 +132,9 @@ this general instruction file.
 ## Herdr
 
 Sessions on this machine may run inside Herdr (terminal workspace manager).
-A `herdr` skill is available — use it when parallel agents, background command
-monitoring, or extra terminal panes would help. Verify `HERDR_ENV=1` first;
-if unset, you are not inside Herdr and its CLI cannot control the session.
+The `herdr` skill is materialized in this repository
+(`config/skills/herdr/SKILL.md`, promoted to `~/.pi/agent/skills/herdr/`) — use it
+when parallel agents, background command monitoring, or extra terminal panes
+would help. Verify `HERDR_ENV=1` first; if unset, you are not inside Herdr and its
+CLI cannot control the session. `herdr --skill` remains the upstream authority for
+current command syntax; re-capture the skill file after a Herdr update.

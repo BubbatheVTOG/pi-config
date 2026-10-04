@@ -2,23 +2,23 @@
   "collapseChangelog": true,
   "defaultModel": "bubba",
   "defaultProvider": "vllm",
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "packages": [
-    "npm:pi-subagents@0.74.0",
+    "npm:pi-subagents@0.75.0",
     "npm:@weihannpmgo/pi-ask-user-question@1.0.0",
     "npm:@tintinweb/pi-tasks@0.9.0",
     "npm:pi-vim",
-    "npm:@narumitw/pi-btw@0.58.1",
-    "npm:pi-lens@4.1.6",
-    "npm:@sting8k/pi-vcc@0.7.2",
+    "npm:@narumitw/pi-btw@0.61.1",
+    "npm:pi-lens@4.3.0",
+    "npm:@sting8k/pi-vcc@0.8.1",
     "npm:pi-tool-display@0.5.0",
     "git:github.com/BubbatheVTOG/pi-boxed-tools@dfa1243f2c106d56b69f68c8fcfc9677ac0baa1a",
     "npm:pi-image-tools@1.4.0",
     "npm:pi-transcript-window@0.3.1",
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@132dbada3c7a7b330ac587c3714ef11d3145970e",
     "git:github.com/BubbatheVTOG/agent-voice@fcd6c58247559c14ec84b2345172b334b193535f",
-    "npm:pi-cache-optimizer@2.8.10",
-    "npm:@narumitw/pi-cache-hit-monitor@0.1.0",
+    "npm:pi-cache-optimizer@2.8.18",
+    "npm:@narumitw/pi-cache-hit-monitor@0.1.1",
     "git:github.com/BubbatheVTOG/pi-foot@a2ca5742911f47663854700a0110d7d9a609ab9b",
     "git:github.com/BubbatheVTOG/pi-jev-anti-slop@94f781062dcf70423057b663d80ea0aa349131e1",
     "git:github.com/BubbatheVTOG/pi-jev-tool-guard@6577b329f88169e3e6ceb77574bec126abf94a0d",
@@ -58,34 +58,6 @@
       "visual": "mode",
       "ex": "mode"
     }
-  },
-  "powerline": {
-    "customItems": [
-      {
-        "excludeFromExtensionStatuses": true,
-        "hideWhenMissing": true,
-        "id": "agent-voice",
-        "position": "right",
-        "selfColorize": true,
-        "statusKey": "agent-voice"
-      },
-      {
-        "excludeFromExtensionStatuses": true,
-        "hideWhenMissing": true,
-        "id": "pi-local-cloud",
-        "position": "right",
-        "selfColorize": true,
-        "statusKey": "pi-local-cloud"
-      },
-      {
-        "excludeFromExtensionStatuses": true,
-        "hideWhenMissing": true,
-        "id": "cache-stats",
-        "position": "right",
-        "statusKey": "pi-cache-stats"
-      }
-    ],
-    "welcome": false
   },
   "quietStartup": true,
   "showLastPrompt": false,
@@ -129,6 +101,6 @@
   "terminal": {
     "showTerminalProgress": true
   },
-  "theme": "hyper-term-white",
+  "theme": "hyper-term-red",
   "lastChangelogVersion": "0.85.1"
 }

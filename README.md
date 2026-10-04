@@ -10,7 +10,12 @@ is not a deployment framework and does not generate configuration snapshots.
 - `config/settings.json` — native Pi settings baseline, including package specs
 - `config/models.json` — model/provider configuration using environment-backed
   credentials where needed
-- `config/skills/` — local skills
+- `config/skills/` — local skills. Skills owned by upstream tools (Hunk's
+  `~/.hunk/skills/`, TypeSafe's `~/.agents/skills/`) are discovered through
+  symlinks under `~/.pi/agent/skills/`; keep them upstream-owned and do not fork
+  copies into this repository.
+- `config/skills/herdr/` — captured snapshot of `herdr --skill` (the upstream
+  authority); re-capture after a Herdr update if command syntax changes
 - `extensions/` — local extensions and plugin configuration, at the same
   relative path the plugin reads under `~/.pi/agent/` (for example
   `extensions/pi-transcript-window/config.json`)
