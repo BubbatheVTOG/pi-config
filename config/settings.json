@@ -102,5 +102,19 @@
     "showTerminalProgress": true
   },
   "theme": "hyper-term-red",
-  "lastChangelogVersion": "0.85.1"
+  "lastChangelogVersion": "0.85.1",
+  "prefill": {
+    "views": [
+      "label",
+      "bar",
+      "percent",
+      "tokens",
+      "tps",
+      "eta"
+    ],
+    "providers": [
+      "josh",
+      "vllm"
+    ]
+  }
 }
