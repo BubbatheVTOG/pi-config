@@ -43,7 +43,7 @@ Caveats:
 
 Installed packages include `pi-subagents`, `@tintinweb/pi-tasks`,
 `@weihannpmgo/pi-ask-user-question`, `pi-foot` (the footer), `pi-lens`,
-`@narumitw/pi-btw`, `pi-tool-display`, `pi-vcc`, and other packages listed by
+`pi-tool-display`, `pi-vcc`, and other packages listed by
 `pi list`. Local extensions and skills are loaded from `~/.pi/agent/`.
 
 - **Delegation** — `subagent` spawns focused children. Built-ins: `scout` (codebase recon

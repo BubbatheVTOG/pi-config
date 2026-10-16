@@ -4,27 +4,25 @@
   "defaultProvider": "vllm",
   "hideThinkingBlock": true,
   "packages": [
-    "npm:pi-subagents@0.75.0",
     "npm:@weihannpmgo/pi-ask-user-question@1.0.0",
-    "npm:@tintinweb/pi-tasks@0.9.0",
+    "npm:@tintinweb/pi-tasks@0.9.1",
     "npm:pi-vim",
-    "npm:@narumitw/pi-btw@0.61.1",
-    "npm:pi-lens@4.3.0",
-    "npm:@sting8k/pi-vcc@0.8.1",
     "npm:pi-tool-display@0.5.0",
     "git:github.com/BubbatheVTOG/pi-boxed-tools@dfa1243f2c106d56b69f68c8fcfc9677ac0baa1a",
     "npm:pi-image-tools@1.4.0",
     "npm:pi-transcript-window@0.3.1",
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@132dbada3c7a7b330ac587c3714ef11d3145970e",
     "git:github.com/BubbatheVTOG/agent-voice@fcd6c58247559c14ec84b2345172b334b193535f",
-    "npm:pi-cache-optimizer@2.8.18",
-    "npm:@narumitw/pi-cache-hit-monitor@0.1.1",
     "git:github.com/BubbatheVTOG/pi-foot@a2ca5742911f47663854700a0110d7d9a609ab9b",
-    "git:github.com/BubbatheVTOG/pi-jev-anti-slop@94f781062dcf70423057b663d80ea0aa349131e1",
-    "git:github.com/BubbatheVTOG/pi-jev-tool-guard@6577b329f88169e3e6ceb77574bec126abf94a0d",
-    "git:github.com/BubbatheVTOG/pi-jev-redact@c3e82fa6c89f2a9823d463503b259c978fc974d9",
-    "git:gitlab.com/bubbathevtog/pi-gitlab-duo-provider@021fb95e777a98795cda2c24369ddcb17e6aee47",
-    "npm:pi-prefill"
+    "npm:pi-subagents@0.78.0",
+    "npm:pi-lens@4.4.3",
+    "npm:@narumitw/pi-cache-hit-monitor@0.1.1",
+    "npm:pi-prefill",
+    "npm:@sting8k/pi-vcc@0.10.2",
+    "npm:pi-cache-optimizer@2.8.27",
+    "git:github.com/BubbatheVTOG/pi-jev-anti-slop@5c474a91376a70931255f810892bb14d0868b37d",
+    "git:github.com/BubbatheVTOG/pi-jev-tool-guard@defaf2d409ee38363644fd543c0f204dee64aa93",
+    "git:github.com/BubbatheVTOG/pi-jev-redact@7a7faec62e0dfc83c583aaebd2d598850f4e15fe"
   ],
   "piFoot": {
     "order": [
@@ -103,7 +101,10 @@
     "showTerminalProgress": true
   },
   "theme": "hyper-term-red",
-  "lastChangelogVersion": "0.85.1",
+  "toolGuard": {
+    "disable": true
+  },
+  "lastChangelogVersion": "1.2.0",
   "prefill": {
     "views": [
       "label",
