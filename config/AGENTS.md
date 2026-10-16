@@ -96,7 +96,9 @@ this general instruction file.
 - Write self-explanatory code. Add comments only for non-obvious constraints, decisions, or
   tradeoffs.
 - Make it work, then make it correct, then make it fast.
-- Apply practical test-driven development.
+- For behavior changes, write or update a focused test first when practical. For documentation,
+  configuration, and mechanical changes, use the checks appropriate to the change; do not add
+  a test solely to satisfy a test-first rule.
 - Write fast, deterministic tests that do not depend on external services.
 - Fail fast and keep the system responsive.
 - Avoid hot-path allocations, pre-size collections when their size is known, and profile
