@@ -1,4 +1,5 @@
 {
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
   "collapseChangelog": true,
   "defaultModel": "bubba",
   "defaultProvider": "vllm",
@@ -122,4 +123,3 @@
   },
   "cacheWarming": "off"
 }
-
