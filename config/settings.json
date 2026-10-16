@@ -22,7 +22,8 @@
     "npm:pi-cache-optimizer@2.8.27",
     "git:github.com/BubbatheVTOG/pi-jev-anti-slop@5c474a91376a70931255f810892bb14d0868b37d",
     "git:github.com/BubbatheVTOG/pi-jev-tool-guard@defaf2d409ee38363644fd543c0f204dee64aa93",
-    "git:github.com/BubbatheVTOG/pi-jev-redact@7a7faec62e0dfc83c583aaebd2d598850f4e15fe"
+    "git:github.com/BubbatheVTOG/pi-jev-redact@7a7faec62e0dfc83c583aaebd2d598850f4e15fe",
+    "git:gitlab.com/bubbathevtog/pi-gitlab-duo-provider@021fb95e777a98795cda2c24369ddcb17e6aee47"
   ],
   "piFoot": {
     "order": [
@@ -121,3 +122,4 @@
   },
   "cacheWarming": "off"
 }
+
