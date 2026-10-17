@@ -13,6 +13,9 @@ const CAPTION = "An agentic coding harness configuration curated by Bubba";
 const CAPTION_ROWS = 2;
 const SPLASH_HEIGHT = ART_HEIGHT + CAPTION_ROWS;
 const VALID_ART_CHARACTERS = new Set([" ", "█", "═", "║", "╔", "╗", "╚", "╝"]);
+// Pi re-fires session_start when a fresh session replaces the current one (/new
+// uses reason "new"); /resume, /fork, /clone, and /reload stay silent.
+const SPLASH_REASONS = new Set(["startup", "new"]);
 
 type CloseSplash = () => void;
 
@@ -79,7 +82,11 @@ export default function (pi: ExtensionAPI): void {
       invalidate(): void {},
     }));
 
-    if (event.reason !== "startup") return;
+    if (!SPLASH_REASONS.has(event.reason)) return;
+
+    // A second session_start (/new) replaces the splash left open by the previous
+    // session; closing it first is the only way its UI factory ever finishes.
+    closeSplash?.();
 
     let art: string[];
     try {
