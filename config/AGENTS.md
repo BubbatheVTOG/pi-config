@@ -83,12 +83,13 @@ this general instruction file.
 
 ## Coding Principles and Rules
 
+### General
+
 - Keep the functional core separate from the imperative shell. Use straightforward control
   flow when it is clearer or more efficient.
 - Do not introduce custom generic abstractions unless they provide meaningful type safety or
   eliminate real duplication.
-- Avoid nested control flow: use guards, invert conditions, or extract cohesive operations
-  (see Complexity below).
+- Avoid nested control flow: use guards, invert conditions, or extract cohesive operations.
 - Prefer immutable records or simple data classes for data.
 - Define interfaces only at meaningful boundaries; use default methods only for behavior that
   is safe and broadly applicable.
@@ -108,7 +109,7 @@ this general instruction file.
 - Do not create custom annotations.
 - Prefer composition over inheritance.
 
-## Complexity
+### Complexity
 
 Readability for the next reader is the standard; cognitive complexity drives the call,
 cyclomatic complexity is the supporting check. Prefer code that is obvious over code that is
