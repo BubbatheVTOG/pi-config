@@ -137,6 +137,31 @@ clever or short.
 - When a change adds a branch, look for one to remove. A net complexity increase needs a
   stated reason in the commit message or PR description.
 
+### Organization
+
+Structure is design, not cleanup deferred to later. Organization is one of the strongest
+levers on both complexity and readability: a good tree lets a reader find the single place a
+change belongs, and a good interface lets them use it without reading the implementation.
+
+- Prefer deep modules: a small, stable interface over a substantial hidden implementation. If
+  a caller must understand the internals to use it, the interface is too shallow.
+- Group files by what they do together, not by what they are. Behavior a reader would look
+  for as one thing should live in one place, not scattered across parallel layers.
+- Nest directories only where the nesting names a real boundary. Flat is correct when the
+  files serve one concept; add a level when it separates genuinely distinct concerns.
+- Reorganize as you work. When a function belongs elsewhere, move it now — into another file
+  or a new module — rather than leaving it where it was first written.
+- Keep moves complete and reviewable: update imports, exports, and call sites in the same
+  change, and leave no re-export shims, duplicated copies, or half-moved code behind.
+- Reduce cross-cutting. Shared behavior lives in one place and is imported, not copied across
+  siblings or reached sideways through a sibling's internals.
+- Keep dependencies one-way. A module may use its own internals and the shared core; it
+  should not reach up into its callers or peer sideways into unrelated siblings.
+- Treat a file accumulating unrelated responsibilities as a signal to split it, not to add
+  another section.
+- Do not add a directory or layer to postpone a decision. Catch-all `utils/`, `common/`, and
+  `helpers/` are a last resort, never a default home.
+
 ## Code & git
 
 - Verify before claiming done: run the project's checks/tests when they exist, and say what
