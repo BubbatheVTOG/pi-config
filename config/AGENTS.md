@@ -87,7 +87,8 @@ this general instruction file.
   flow when it is clearer or more efficient.
 - Do not introduce custom generic abstractions unless they provide meaningful type safety or
   eliminate real duplication.
-- Avoid nested control flow: use guards, invert conditions, or extract cohesive operations.
+- Avoid nested control flow: use guards, invert conditions, or extract cohesive operations
+  (see Complexity below).
 - Prefer immutable records or simple data classes for data.
 - Define interfaces only at meaningful boundaries; use default methods only for behavior that
   is safe and broadly applicable.
@@ -106,6 +107,34 @@ this general instruction file.
 - Keep reference and variable names consistent with their class names.
 - Do not create custom annotations.
 - Prefer composition over inheritance.
+
+## Complexity
+
+Readability for the next reader is the standard; cognitive complexity drives the call,
+cyclomatic complexity is the supporting check. Prefer code that is obvious over code that is
+clever or short.
+
+- Keep functions small and single-purpose. If a name needs "and" or "or", split the function.
+- If a block needs a comment to explain what it does, extract it into a well-named function.
+- Limit nesting to two levels inside a function body. Deeper means: early return, `continue`,
+  or extract a helper.
+- Handle invalid, empty, and error cases up front and return early. The happy path stays
+  unindented and lands last.
+- Extract named predicates instead of chaining `&&`/`||` with negations. Avoid double
+  negation and inverted flags.
+- Replace boolean/flag parameters with separate functions or an explicit type; a flag
+  argument usually means two functions sharing a body.
+- Prefer data-driven dispatch (table, map, or small polymorphic set) over long
+  `if`/`else if` or `switch` chains whose branches do the same kind of thing.
+- Nest ternaries at most one level; otherwise extract or use an explicit block.
+- Do not compress code to reduce line count. Multi-statement lines, dense one-liners, and
+  long chained expressions cut the metric at the cost of cognitive load.
+- Target cyclomatic complexity at or below 10 per function. Treat 15 as a hard stop: split
+  the function before adding anything else to it.
+- Refactor before extending. If the code is already hard to follow, extract first, then add
+  behavior, so the diff separates restructuring from the change.
+- When a change adds a branch, look for one to remove. A net complexity increase needs a
+  stated reason in the commit message or PR description.
 
 ## Code & git
 
