@@ -155,10 +155,10 @@ change belongs, and a good interface lets them use it without reading the implem
   change, and leave no re-export shims, duplicated copies, or half-moved code behind.
 - Reduce cross-cutting. Shared behavior lives in one place and is imported, not copied across
   siblings or reached sideways through a sibling's internals.
-- Never reimplement an existing capability. If one module does file IO through an interface,
-  another module calls that interface; it does not write its own file IO beside it. When two
-  modules need the same capability, extract it into a module both depend on. One
-  implementation, one place to fix it.
+- Never reimplement an existing capability. If a module already provides something behind an
+  interface, other modules call that interface instead of building a parallel version of
+  their own. When two modules need the same capability, extract it into a module both depend
+  on: one implementation, one place to fix it.
 - Keep code DRY about knowledge, not about appearance. Two things that merely resemble each
   other stay separate; two things that encode the same rule or capability get one home.
 - Keep dependencies one-way. A module may use its own internals and the shared core; it
