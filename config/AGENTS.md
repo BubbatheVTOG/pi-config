@@ -85,85 +85,147 @@ this general instruction file.
 
 ### General
 
-- Keep the functional core separate from the imperative shell; use straightforward control
+- Keep the functional core separate from the imperative shell. Use straightforward control
   flow when it is clearer or more efficient.
-- No generic abstraction without real type safety or real duplication eliminated. Prefer
-  composition over inheritance; interfaces only at meaningful boundaries.
-- Prefer immutable records; keep names consistent with the types they describe; no custom
-  annotations.
-- Unary or binary functions where practical; for more inputs, a cohesive parameter object.
-- Write self-explanatory code; comment only non-obvious constraints, decisions, or tradeoffs.
-- Make it work, then correct, then fast. Pre-size collections, avoid hot-path allocations, and
-  profile before optimizing.
+- Do not introduce custom generic abstractions unless they provide meaningful type safety or
+  eliminate real duplication.
+- Avoid nested control flow: use guards, invert conditions, or extract cohesive operations.
+- Prefer immutable records or simple data classes for data.
+- Define interfaces only at meaningful boundaries; use default methods only for behavior that
+  is safe and broadly applicable.
+- Prefer unary or binary functions where practical. For more inputs, introduce cohesive
+  parameter objects.
+- Write self-explanatory code. Add comments only for non-obvious constraints, decisions, or
+  tradeoffs.
+- Make it work, then make it correct, then make it fast.
+- For behavior changes, write or update a focused test first when practical. For documentation,
+  configuration, and mechanical changes, use the checks appropriate to the change; do not add
+  a test solely to satisfy a test-first rule.
+- Write fast, deterministic tests that do not depend on external services.
 - Fail fast and keep the system responsive.
-- Test-first for behavior changes when practical; other changes get the checks that fit them.
-  Tests are fast, deterministic, and need no external services.
+- Avoid hot-path allocations, pre-size collections when their size is known, and profile
+  before optimizing allocations.
+- Keep reference and variable names consistent with their class names.
+- Do not create custom annotations.
+- Prefer composition over inheritance.
 
 ### Complexity
 
-Optimize for the next reader. Cognitive complexity decides; cyclomatic complexity is the
-supporting check. Obvious beats clever or short.
+Readability for the next reader is the standard; cognitive complexity drives the call,
+cyclomatic complexity is the supporting check. Prefer code that is obvious over code that is
+clever or short.
 
-- Small, single-purpose functions. If the name needs "and" or "or", split it; if a block needs
-  a comment, extract a well-named function.
-- At most two nesting levels. Deeper means early return, `continue`, or an extracted helper.
-- Handle invalid, empty, and error cases first, so the happy path stays unindented and last.
-- Named predicates instead of negated `&&`/`||` chains; no double negation or inverted flags.
-- No flag parameters: they usually mean two functions sharing a body.
-- Data-driven dispatch over `if`/`else if`/`switch` chains whose branches do the same kind of
-  thing. Nest ternaries at most one level.
-- Never compress code to cut line count; dense lines trade a metric for cognitive load.
-- Cyclomatic complexity at or below 10 per function; 15 is a hard stop, split first.
-- Refactor before extending. A change that adds a branch should remove one; a net increase
-  needs a stated reason in the commit or pull request.
+- Keep functions small and single-purpose. If a name needs "and" or "or", split the function.
+- If a block needs a comment to explain what it does, extract it into a well-named function.
+- Limit nesting to two levels inside a function body. Deeper means: early return, `continue`,
+  or extract a helper.
+- Handle invalid, empty, and error cases up front and return early. The happy path stays
+  unindented and lands last.
+- Extract named predicates instead of chaining `&&`/`||` with negations. Avoid double
+  negation and inverted flags.
+- Replace boolean/flag parameters with separate functions or an explicit type; a flag
+  argument usually means two functions sharing a body.
+- Prefer data-driven dispatch (table, map, or small polymorphic set) over long
+  `if`/`else if` or `switch` chains whose branches do the same kind of thing.
+- Nest ternaries at most one level; otherwise extract or use an explicit block.
+- Do not compress code to reduce line count. Multi-statement lines, dense one-liners, and
+  long chained expressions cut the metric at the cost of cognitive load.
+- Target cyclomatic complexity at or below 10 per function. Treat 15 as a hard stop: split
+  the function before adding anything else to it.
+- Refactor before extending. If the code is already hard to follow, extract first, then add
+  behavior, so the diff separates restructuring from the change.
+- When a change adds a branch, look for one to remove. A net complexity increase needs a
+  stated reason in the commit message or PR description.
 
 ### Organization
 
-Structure is design. It is a stronger lever on complexity and readability than any single
-function you will rewrite.
+Structure is design, not cleanup deferred to later. Organization is one of the strongest
+levers on both complexity and readability: a good tree lets a reader find the single place a
+change belongs, and a good interface lets them use it without reading the implementation.
 
-- Deep modules: a small, stable interface over a substantial hidden implementation. If callers
-  must read internals to use it, the interface is too shallow.
-- Group files by what they do together, not what they are. Nest a directory only when the level
-  names a real boundary; flat is right for one concept. No catch-all `utils/`, `common/`,
-  `helpers/`.
-- Move code as you work. A function that belongs elsewhere moves now, even into a new file, with
-  imports and call sites updated in the same change and no shims or duplicate copies left behind.
-- Dependencies run one way: a module may use its own internals and the shared core, never reach
-  up into callers or sideways into unrelated siblings.
-- Never reimplement an existing capability. If a module provides it behind an interface, call
-  that interface; when two modules need the same thing, extract a module both depend on. One
-  implementation, one place to fix it.
-- DRY is about knowledge, not appearance: lookalike code encoding different rules stays apart.
-- Unrelated responsibilities accumulating in one file is a signal to split it.
+- Prefer deep modules: a small, stable interface over a substantial hidden implementation. If
+  a caller must understand the internals to use it, the interface is too shallow.
+- Group files by what they do together, not by what they are. Behavior a reader would look
+  for as one thing should live in one place, not scattered across parallel layers.
+- Nest directories only where the nesting names a real boundary. Flat is correct when the
+  files serve one concept; add a level when it separates genuinely distinct concerns.
+- Reorganize as you work. When a function belongs elsewhere, move it now — into another file
+  or a new module — rather than leaving it where it was first written.
+- Keep moves complete and reviewable: update imports, exports, and call sites in the same
+  change, and leave no re-export shims, duplicated copies, or half-moved code behind.
+- Reduce cross-cutting. Shared behavior lives in one place and is imported, not copied across
+  siblings or reached sideways through a sibling's internals.
+- Never reimplement an existing capability. If a module already provides something behind an
+  interface, other modules call that interface instead of building a parallel version of
+  their own. When two modules need the same capability, extract it into a module both depend
+  on: one implementation, one place to fix it.
+- Keep code DRY about knowledge, not about appearance. Two things that merely resemble each
+  other stay separate; two things that encode the same rule or capability get one home.
+- Keep dependencies one-way. A module may use its own internals and the shared core; it
+  should not reach up into its callers or peer sideways into unrelated siblings.
+- Treat a file accumulating unrelated responsibilities as a signal to split it, not to add
+  another section.
+- Do not add a directory or layer to postpone a decision. Catch-all `utils/`, `common/`, and
+  `helpers/` are a last resort, never a default home.
 
 ### Logging
 
-- Use an established library; never hand-roll a logger, formatter, or sink. Levels, formats, and
-  destinations are configuration.
-- Structured single-line records with stable field names (JSON where supported). Timestamps are
-  sortable and unambiguous (`YYYY-MM-DD HH:MM:SS` plus offset), never locale-dependent.
-- A correlation id on every record, propagated explicitly across boundaries. Durations from an
-  injected monotonic clock, timestamps from wall clock, so tests control time.
-- Log once, where the failure is recovered, reported, or returned: not at every layer, never
-  log-and-rethrow, and preserve the cause chain instead of wrapping it.
-- Error records stand alone: what failed, on what, and why. Never "something went wrong", never
-  a bare exception. ERROR means a human must act; expected failures are INFO or WARN.
-- WARN means degraded but handled: fallback taken, retry that succeeded, deprecated path. INFO
-  records the timeline, not each item in a loop. DEBUG is diagnosis, off in production.
-- Never log secrets, credentials, tokens, or unnecessary personal data; redact in the logging
-  layer, not by caller discipline. Nothing in hot paths or tight loops.
-- Logging is not error handling. A failure that changes control flow needs a returned error.
+Logs answer a question someone asks later, usually while something is broken. Each level
+answers a different one: ERROR means a human must act, WARN something degraded but was
+handled, INFO what the system did, DEBUG how it did it.
+
+- Use an established logging library. Do not hand-roll a logger, formatter, or sink unless the
+  ecosystem genuinely lacks one; library configuration is where levels, formats, and
+  destinations belong.
+- Prefer structured, single-line records with stable field names (JSON where the runtime's
+  logger supports it) over concatenated prose.
+- Include a correlation id on every record tied to a unit of work (request, job, session), and
+  propagate it explicitly across boundaries instead of relying on ambient global state.
+- Timestamps use a sortable, unambiguous format (ISO 8601-style, e.g. `YYYY-MM-DD HH:MM:SS`)
+  with a timezone or offset. Never use locale-dependent formats.
+- Measure durations from a monotonic clock; stamp records from wall clock. Inject the clock
+  through the module that owns the operation so tests can control time.
+- Log once, at the boundary that decides. Record the failure where it is recovered, reported,
+  or returned — not at every layer it passes through, and never log-and-rethrow.
+- Error records must stand alone: what failed, on what, and why, with enough context to act.
+  Name the operation, the affected identifier, and the cause — never "something went wrong",
+  and never a bare exception object.
+- Preserve the cause chain. Log the underlying error once with its message and stack; do not
+  wrap it in a message that hides the original.
+- Reserve ERROR for conditions that need a human. Expected failures — validation rejections,
+  missing optional input, user error — belong at INFO or WARN.
+- Use WARN for degraded-but-handled: a fallback taken, a retry that succeeded, a threshold
+  nearly crossed, a deprecated path in use. If nothing degraded and nothing acts on it, it is
+  not a warning.
+- Use INFO for lifecycle and state transitions a reader needs to reconstruct a timeline:
+  startup and shutdown, configuration loaded, work started and finished with outcome. Not
+  per-item inside a loop.
+- Keep DEBUG for diagnosis — inputs, intermediate state, retry detail — and assume it is off in
+  production.
+- Never log secrets, credentials, tokens, keys, or unnecessary personal data. Redact at the
+  logging boundary instead of trusting callers to pass clean values.
+- No logging in hot paths or tight loops; sample, aggregate, or drop it.
+- Logging is not error handling. If a failure must change control flow it needs a returned
+  error or exception; a log line alone fixes nothing.
 
 ### IO and network logging
 
-- One record per call crossing a process, network, or storage boundary, emitted by the module
-  that makes it: target, correlation id, timestamp, outcome status, elapsed duration. Request
-  and response share the record; a call that fails before responding still emits one.
-- Headers and bodies are logged by data class, not by default: include them when the payload
-  explains the failure, otherwise log content type and byte length.
-- Redact authorization headers, cookies, tokens, keys, and personal data before writing,
-  including in echoed bodies, and size-cap large, binary, or streaming payloads.
+- Every call crossing a process, network, or storage boundary gets one record per operation,
+  emitted by the module that performs the call.
+- Record the call target, the correlation id, the timestamp, the outcome status (status code or
+  equivalent), and the elapsed duration. Request and response belong to the same record when
+  they can be, so no later matching is required.
+- A call that fails before a response arrives still produces its record, carrying the same
+  correlation id and duration.
+- Headers and bodies are logged by data class, not by default: include them when the payload is
+  what explains the failure, and otherwise record content type and byte length rather than the
+  body.
+- Redact before writing: authorization headers, cookies, tokens, keys, and personal data never
+  appear, including inside echoed request bodies. Redaction lives in the logging layer, not in
+  caller discipline.
+- Size-cap and truncate payloads. Large, binary, or streaming bodies are never dumped verbatim.
+- Elapsed time is measured by the client from the injected clock, so callers do not duplicate
+  the measurement.
 
 ## Code & git
 
