@@ -95,8 +95,9 @@ this general instruction file.
   a test solely to satisfy a test-first rule.
 - Write fast, deterministic tests that do not depend on external services.
 - Fail fast and keep the system responsive.
-- Avoid hot-path allocations, pre-size collections when their size is known, and profile
-  before optimizing allocations.
+- Avoid hot-path allocations: pre-size collections when their size is known, and prefer
+  arena, region, or pool allocation for many short-lived values sharing a lifetime where the
+  runtime supports it. Profile before optimizing allocations.
 - Keep reference and variable names consistent with their class names.
 - Do not create custom annotations.
 - Prefer composition over inheritance.
