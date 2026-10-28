@@ -141,8 +141,10 @@ Structure is design, and it is a stronger lever on complexity than any single fu
 - Use an established library; never hand-roll a logger, formatter, or sink.
 - Structured single-line records with stable field names (JSON where supported).
 - A correlation id on every record, propagated explicitly across boundaries.
-- Timestamps sortable and unambiguous (`YYYY-MM-DD HH:MM:SS` plus offset), never
-  locale-dependent.
+- Timestamps are UTC in RFC 3339 / ISO 8601 form with fixed-width fractional seconds
+  (`2025-01-15T14:23:05.123Z`), so they sort lexicographically and parse everywhere. Local
+  and space-separated forms are for human display only, never the logged value, and never a
+  locale-dependent format.
 - Durations from a monotonic clock, timestamps from wall clock, both injected so tests can
   control time.
 - Log once, where the failure is recovered, reported, or returned; never log-and-rethrow.
