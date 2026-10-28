@@ -168,6 +168,65 @@ change belongs, and a good interface lets them use it without reading the implem
 - Do not add a directory or layer to postpone a decision. Catch-all `utils/`, `common/`, and
   `helpers/` are a last resort, never a default home.
 
+### Logging
+
+Logs answer a question someone asks later, usually while something is broken. Each level
+answers a different one: ERROR means a human must act, WARN something degraded but was
+handled, INFO what the system did, DEBUG how it did it.
+
+- Use an established logging library. Do not hand-roll a logger, formatter, or sink unless the
+  ecosystem genuinely lacks one; library configuration is where levels, formats, and
+  destinations belong.
+- Prefer structured, single-line records with stable field names (JSON where the runtime's
+  logger supports it) over concatenated prose.
+- Include a correlation id on every record tied to a unit of work (request, job, session), and
+  propagate it explicitly across boundaries instead of relying on ambient global state.
+- Timestamps use a sortable, unambiguous format (ISO 8601-style, e.g. `YYYY-MM-DD HH:MM:SS`)
+  with a timezone or offset. Never use locale-dependent formats.
+- Measure durations from a monotonic clock; stamp records from wall clock. Inject the clock
+  through the module that owns the operation so tests can control time.
+- Log once, at the boundary that decides. Record the failure where it is recovered, reported,
+  or returned — not at every layer it passes through, and never log-and-rethrow.
+- Error records must stand alone: what failed, on what, and why, with enough context to act.
+  Name the operation, the affected identifier, and the cause — never "something went wrong",
+  and never a bare exception object.
+- Preserve the cause chain. Log the underlying error once with its message and stack; do not
+  wrap it in a message that hides the original.
+- Reserve ERROR for conditions that need a human. Expected failures — validation rejections,
+  missing optional input, user error — belong at INFO or WARN.
+- Use WARN for degraded-but-handled: a fallback taken, a retry that succeeded, a threshold
+  nearly crossed, a deprecated path in use. If nothing degraded and nothing acts on it, it is
+  not a warning.
+- Use INFO for lifecycle and state transitions a reader needs to reconstruct a timeline:
+  startup and shutdown, configuration loaded, work started and finished with outcome. Not
+  per-item inside a loop.
+- Keep DEBUG for diagnosis — inputs, intermediate state, retry detail — and assume it is off in
+  production.
+- Never log secrets, credentials, tokens, keys, or unnecessary personal data. Redact at the
+  logging boundary instead of trusting callers to pass clean values.
+- No logging in hot paths or tight loops; sample, aggregate, or drop it.
+- Logging is not error handling. If a failure must change control flow it needs a returned
+  error or exception; a log line alone fixes nothing.
+
+### IO and network logging
+
+- Every call crossing a process, network, or storage boundary gets one record per operation,
+  emitted by the module that performs the call.
+- Record the call target, the correlation id, the timestamp, the outcome status (status code or
+  equivalent), and the elapsed duration. Request and response belong to the same record when
+  they can be, so no later matching is required.
+- A call that fails before a response arrives still produces its record, carrying the same
+  correlation id and duration.
+- Headers and bodies are logged by data class, not by default: include them when the payload is
+  what explains the failure, and otherwise record content type and byte length rather than the
+  body.
+- Redact before writing: authorization headers, cookies, tokens, keys, and personal data never
+  appear, including inside echoed request bodies. Redaction lives in the logging layer, not in
+  caller discipline.
+- Size-cap and truncate payloads. Large, binary, or streaming bodies are never dumped verbatim.
+- Elapsed time is measured by the client from the injected clock, so callers do not duplicate
+  the measurement.
+
 ## Code & git
 
 - Verify before claiming done: run the project's checks/tests when they exist, and say what
