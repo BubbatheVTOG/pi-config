@@ -9,7 +9,7 @@
     "npm:@tintinweb/pi-tasks@0.9.1",
     "npm:pi-vim",
     "npm:pi-tool-display@0.5.0",
-    "git:github.com/BubbatheVTOG/pi-boxed-tools@dfa1243f2c106d56b69f68c8fcfc9677ac0baa1a",
+    "git:github.com/BubbatheVTOG/pi-boxed-tools@96d414c69b56334382f47493f8b34f7f068d9172",
     "npm:pi-image-tools@1.4.0",
     "npm:pi-transcript-window@0.3.1",
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@132dbada3c7a7b330ac587c3714ef11d3145970e",
