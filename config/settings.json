@@ -14,7 +14,7 @@
     "npm:pi-image-tools@1.4.0",
     "npm:pi-transcript-window@0.3.1",
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@132dbada3c7a7b330ac587c3714ef11d3145970e",
-    "git:github.com/BubbatheVTOG/agent-voice@2bfc7f0b0af63a48db87aa0388a8a23a6031a80d",
+    "git:github.com/BubbatheVTOG/agent-voice@454d3f5d57bd1d5a75021310b0fc718db9f4fba4",
     "git:github.com/BubbatheVTOG/pi-foot@a2ca5742911f47663854700a0110d7d9a609ab9b",
     "npm:pi-subagents@0.84.0",
     "npm:pi-lens@4.4.7",
