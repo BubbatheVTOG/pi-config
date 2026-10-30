@@ -1,9 +1,10 @@
 {
   "$schema": "https://pi.dev/schemas/settings.schema.json",
   "collapseChangelog": true,
+  "enableSkillCommands": true,
   "defaultModel": "bubba",
-  "defaultProvider": "vllm",
-  "hideThinkingBlock": true,
+  "defaultProvider": "local",
+  "hideThinkingBlock": false,
   "packages": [
     "npm:@weihannpmgo/pi-ask-user-question@1.0.0",
     "npm:@tintinweb/pi-tasks@0.9.1",
@@ -15,12 +16,12 @@
     "git:github.com/BubbatheVTOG/pi-local-cloud-toggle@132dbada3c7a7b330ac587c3714ef11d3145970e",
     "git:github.com/BubbatheVTOG/agent-voice@ef40e297671f5379fd23e3f2f589a65938c66c1f",
     "git:github.com/BubbatheVTOG/pi-foot@a2ca5742911f47663854700a0110d7d9a609ab9b",
-    "npm:pi-subagents@0.78.0",
-    "npm:pi-lens@4.4.3",
-    "npm:@narumitw/pi-cache-hit-monitor@0.1.1",
+    "npm:pi-subagents@0.84.0",
+    "npm:pi-lens@4.4.7",
+    "npm:@narumitw/pi-cache-hit-monitor@0.1.2",
     "npm:pi-prefill",
-    "npm:@sting8k/pi-vcc@0.10.2",
-    "npm:pi-cache-optimizer@2.8.27",
+    "npm:@sting8k/pi-vcc@0.11.2",
+    "npm:pi-cache-optimizer@2.10.4",
     "git:github.com/BubbatheVTOG/pi-jev-anti-slop@5c474a91376a70931255f810892bb14d0868b37d",
     "git:github.com/BubbatheVTOG/pi-jev-tool-guard@defaf2d409ee38363644fd543c0f204dee64aa93",
     "git:github.com/BubbatheVTOG/pi-jev-redact@7a7faec62e0dfc83c583aaebd2d598850f4e15fe",
@@ -106,7 +107,7 @@
   "toolGuard": {
     "disable": true
   },
-  "lastChangelogVersion": "1.2.0",
+  "lastChangelogVersion": "1.4.0",
   "prefill": {
     "views": [
       "label",
@@ -118,7 +119,8 @@
     ],
     "providers": [
       "josh",
-      "vllm"
+      "vllm",
+      "local"
     ]
   },
   "cacheWarming": "off"
