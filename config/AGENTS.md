@@ -5,21 +5,47 @@ Global file: loaded in every Pi session regardless of cwd. Project `AGENTS.md` /
 this. The authoritative copy lives in `~/git/pi-config/config/AGENTS.md`; the live copy is
 `~/.pi/agent/AGENTS.md`. Run `/reload` after editing.
 
+## Presenting information
+
+Choose the shape that makes the relationship visible. Prose is the fallback, not the default.
+
+| Content                                          | Shape                                               |
+| ------------------------------------------------ | --------------------------------------------------- |
+| items with two or more comparable attributes     | table                                               |
+| options with trade-offs                          | table: one row per option, one column per criterion |
+| ordered steps or phases                          | numbered list                                       |
+| branching flow, retries, state or status changes | ASCII diagram                                       |
+| file layout, ownership, or data shape            | ASCII tree or labelled boxes                        |
+| before/after, migration, or change summary       | two-column table (`before` / `after`)               |
+| a single fact or a one-sentence answer           | prose                                               |
+
+- Lead with the conclusion, then the table or diagram that supports it. Do not make the reader
+  assemble the summary from the detail.
+- Keep tables narrow enough to read without horizontal scrolling, with a header that names what
+  every column holds. Short cells belong in the table; long prose belongs in a sentence under it.
+- Diagrams are plain ASCII or box-drawing characters, never Mermaid: the reader is a terminal.
+- Label every state, edge, and direction; an unlabelled box is decoration.
+- One idea per diagram. Split into two rather than nesting one inside the other.
+- Keep row order stable across a comparison so the difference stands out, and align numbers on
+  their digits.
+- Never decorate a one-line answer with a table, and never let a table replace the sentence that
+  explains it.
+
 ## Command-line tools
 
 Prefer these over GNU defaults when constructing bash commands:
 
-| Instead of | Use   | Notes                                          |
-| ---------- | ----- | ---------------------------------------------- |
-| grep       | `rg`  | recursive by default                           |
-| find       | `fd`  | skips hidden/ignored; add `-H`/`-u` to include |
-| ls         | `eza` | `-la --icons` for detail                       |
-| cat        | `bat` | add `-p` when output is piped or parsed        |
-| df         | `duf` |                                                |
-| ps         | `procs` |                                              |
-| du         | `ncdu` / `duf` |                                       |
-| top        | `btop` | interactive monitoring                        |
-| man        | `tldr` | practical examples first, then man            |
+| Instead of | Use            | Notes                                          |
+| ---------- | -------------- | ---------------------------------------------- |
+| grep       | `rg`           | recursive by default                           |
+| find       | `fd`           | skips hidden/ignored; add `-H`/`-u` to include |
+| ls         | `eza`          | `-la --icons` for detail                       |
+| cat        | `bat`          | add `-p` when output is piped or parsed        |
+| df         | `duf`          |                                                |
+| ps         | `procs`        |                                                |
+| du         | `ncdu` / `duf` |                                                |
+| top        | `btop`         | interactive monitoring                         |
+| man        | `tldr`         | practical examples first, then man             |
 
 Also:
 
