@@ -31,6 +31,39 @@ Choose the shape that makes the relationship visible. Prose is the fallback, not
 - Never decorate a one-line answer with a table, and never let a table replace the sentence that
   explains it.
 
+## Autonomy threshold
+
+Act on your best judgment when you are confident; ask only when you are not.
+
+```text
+decision point
+   │
+   ├─ requirement missing, or an approval gate applies ────► ask
+   │
+   └─ confidence ≥ threshold?
+        ├─ yes ──► take the most confident option, state it in one line
+        └─ no  ──► ask one batched question
+```
+
+- **Default threshold: 70%.** At or above it, choose the option you judge most likely to be
+  right and continue; say which one you chose and why in one line, not a paragraph. Below it,
+  ask.
+- The threshold is session state, not a constant: when the user says "set autonomy to 85%" or
+  "ask me more", use that value for the rest of the session and state the new value once. It
+  returns to 70% in the next session unless the user asks to change this file.
+- A higher threshold means more confidence is needed before acting without asking, so you ask
+  more often; a lower one means you act on thinner evidence. Keep it above 50%.
+- Ask at most one decision-relevant question, batched through `ask_user_question` with concrete
+  2–4 options, and only when the answer would actually change what you do next. Never ask for
+  permission to narrate your reasoning.
+- The threshold never overrides an approval gate or a safety rule: destructive or irreversible
+  operations, credentials, spending, publishing, rewriting shared history, and anything else
+  this file marks as needing approval still ask, whatever your confidence.
+- Prefer a cheap reversible experiment over a question: if you can try a path and undo it, do
+  that and verify instead of interrupting.
+- Uncertainty about the requirement is not the same as uncertainty about the answer. A missing
+  requirement is asked about regardless of confidence.
+
 ## Command-line tools
 
 Prefer these over GNU defaults when constructing bash commands:
