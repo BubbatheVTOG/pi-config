@@ -146,8 +146,7 @@ this general instruction file.
   is safe and broadly applicable.
 - Prefer unary or binary functions where practical. For more inputs, introduce cohesive
   parameter objects.
-- Write self-explanatory code. Add comments only for non-obvious constraints, decisions, or
-  tradeoffs.
+- Write self-explanatory code. Comment only what the code cannot say for itself; see Comments.
 - Make it work, then make it correct, then make it fast.
 - For behavior changes, write or update a focused test first when practical. For documentation,
   configuration, and mechanical changes, use the checks appropriate to the change; do not add
@@ -160,6 +159,27 @@ this general instruction file.
 - Keep reference and variable names consistent with their class names.
 - Do not create custom annotations.
 - Prefer composition over inheritance.
+
+### Comments
+
+A comment describes the code beside it, never the history of the code or the rest of the
+system.
+
+- Comment only what the code cannot say for itself: an unclear line, a business rule, a
+  constraint, or an invariant that a reader would otherwise misread.
+- Never restate what the code already says: no echoed names, signatures, or step-by-step
+  narration of obvious lines.
+- Never record history: no prior designs, rejected options, old behavior, migration notes,
+  or "used to" / "instead of" / "TODO refactor" commentary. That belongs in the commit
+  message.
+- Never let another module, file, or symbol stand in for the explanation ("see FooManager",
+  "as in the parser"): a reader must understand the line without leaving the file. State the
+  rule, or link real documentation where it exists.
+- Name rules in domain terms so the reason survives the code: "orders ship only after 14:00
+  UTC", not "because of the offset above".
+- Keep a comment adjacent to the line it describes: one line where possible, a few at most.
+- Update or delete the comment in the same change that invalidates it; a stale comment is a
+  bug, and deleting beats rewording.
 
 ### Complexity
 
